@@ -1,7 +1,8 @@
+import React from 'react';
 import imageOne from '../../assets/image-1.jpg';
 import imageTwo from '../../assets/image-2.jpg';
 
-function Home() {
+function Welcome() {
 
     return (
         <div className="home-main">
@@ -71,4 +72,4 @@ function Home() {
     )
 
 }
-export default Home
+export default Welcome

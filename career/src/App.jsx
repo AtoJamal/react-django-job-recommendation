@@ -1,14 +1,10 @@
 
-import Home from "./Pages/JobSeeker/Welcome.jsx"
+import React from 'react'
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
-  return (
-    <>
-      <Home />
-
-    </>
-
-  )
+  return <AppRoutes />;
 }
 
 export default App
