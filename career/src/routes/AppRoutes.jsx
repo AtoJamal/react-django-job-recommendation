@@ -33,7 +33,7 @@ import App from '../App';
 
 const AppRoutes = () => (
     <Routes>
-        <Route path="/" element={<Welcome />} />
+        <Route path="/" element={<JobSeekerAccount />} />
     </Routes>
 
 

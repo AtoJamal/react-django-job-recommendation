@@ -1,75 +1,333 @@
 import React from 'react';
-import imageOne from '../../assets/image-1.jpg';
+import '../../styles/pages/JobSeeker/Welcome.css';
+import imageOne from '../../assets/image-1.avif';
 import imageTwo from '../../assets/image-2.jpg';
+import imageThree from '../../assets/image-2.jpg';
 
-function Welcome() {
+
+
+
+import { useState, useEffect } from 'react';
+import { motion, useScroll, useAnimation, AnimatePresence } from 'framer-motion';
+import { FiArrowRight, FiCheckCircle, FiBell, FiBarChart2 } from 'react-icons/fi';
+import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
+
+
+
+
+const Welcome = () => {
+    const [scrolled, setScrolled] = useState(false);
+    const controls = useAnimation();
+    const { scrollY } = useScroll();
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                setScrolled(true);
+            } else {
+                setScrolled(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
+        scrollY.onChange((latest) => {
+            if (latest > 300) {
+                controls.start("visible");
+            }
+        });
+    }, [scrollY, controls]);
+
+    const testimonials = [
+        {
+            id: 1,
+            name: "Jemal Hussen",
+            role: "UX Designer",
+            content: "CareerPlus helped me find my dream job in just 2 weeks! The AI recommendations were spot on.",
+            avatar: imageTwo
+        },
+        {
+            id: 2,
+            name: "Telehaymanot Wale",
+            role: "Software Engineer",
+            content: "I was getting frustrated with traditional job boards. CareerPlus understands what I'm looking for.",
+            avatar: imageThree
+        },
+        {
+            id: 3,
+            name: "Yosef Kasse",
+            role: "Marketing Manager",
+            content: "The real-time alerts saved me so much time.",
+            avatar: imageOne
+        }
+    ];
+
+    const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [testimonials.length]);
 
     return (
-        <div className="home-main">
-            <header className="home-header">
-                <div className="brand-text"><h1>CareerPlus</h1></div>
-                <div className="home-menu">
-                    <a href="">Home</a>
-                    <a href="">About</a>
-                    <a href="">Services</a>
-                    <a href="">Login</a>
-                    <a href=""><i className="fas fa-search"></i></a>
-                    <a className="btn-1" href="">Register</a>
+        <div className="careerplus">
+            {/* Header */}
+            <motion.header
+                className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
+                initial={{ backgroundColor: 'rgba(255, 255, 255, 0)' }}
+                animate={{ backgroundColor: scrolled ? 'rgb(255, 255, 255)' : 'rgba(255, 255, 255, 0)' }}
+                transition={{ duration: 0.3 }}
+            >
+                <div className="careerplus__header-container">
+                    <motion.h1
+                        className="careerplus__logo"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        CareerPlus
+                    </motion.h1>
+
+                    <nav className="careerplus__nav">
+                        <a href="#home" className="careerplus__nav-link">Home</a>
+                        <a href="#features" className="careerplus__nav-link">Features</a>
+                        <a href="#testimonials" className="careerplus__nav-link">Testimonials</a>
+                        <a href="#contact" className="careerplus__nav-link">Contact</a>
+                        <a href="#login" className="careerplus__nav-link">Login</a>
+                        <a href="#register" className="careerplus__nav-link careerplus__nav-link--register">Register</a>
+                    </nav>
+                </div>
+            </motion.header>
+
+            {/* Hero Section */}
+            <section id="home" className="careerplus__hero">
+                <div className="careerplus__hero-content">
+                    <motion.h2
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="careerplus__hero-title"
+                    >
+                        Revolutionize Your Job Search with AI.
+                    </motion.h2>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.4 }}
+                        className="careerplus__hero-text"
+                    >
+                        Find your perfect job match, smarter and faster.
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.6 }}
+                        className="careerplus__hero-buttons"
+                    >
+                        <button className="careerplus__hero-btn careerplus__hero-btn--primary">
+                            Get Started <FiArrowRight />
+                        </button>
+                        <button className="careerplus__hero-btn careerplus__hero-btn--secondary">
+                            Explore
+                        </button>
+                    </motion.div>
                 </div>
 
-            </header>
-            <section className="home-sec-1">
-                <div className="home-sec-1-head">
-                    <div className="home-sec-1-head-1"></div>
-                    <div className="home-sec-1-head-2"></div>
-                </div>
-                <div className="home-sec-1-body">
-                    <div className="home-sec-1-body-1">
-                        <div className="home-sec-1-body-1-1">
-                            <h1>Find Your Dearm Job With AI-Powered Recommendations.</h1>
-                            <p>AI-Driven Job Search: Faster, Smarter, Better!</p>
-                            <button className="btn-2">About</button>
+                <motion.div
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                    className="careerplus__hero-image"
+                >
+                    <img src={imageOne} alt="AI job search illustration" />
+                </motion.div>
+            </section>
+
+            {/* Features Section */}
+            <section id="features" className="careerplus__features">
+                <motion.h3
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="careerplus__section-title"
+                >
+                    Why Choose CareerPlus?
+                </motion.h3>
+
+                <div className="careerplus__features-grid">
+                    <motion.div
+                        variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0 }
+                        }}
+                        initial="hidden"
+                        animate={controls}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="careerplus__feature-card"
+                    >
+                        <div className="careerplus__feature-icon">
+                            <FiCheckCircle />
                         </div>
+                        <h4 className="careerplus__feature-title">Personalized Recommendations</h4>
+                        <p className="careerplus__feature-text">
+                            Our AI learns your preferences to suggest jobs that truly match your skills and aspirations.
+                        </p>
+                    </motion.div>
 
-                    </div>
-                    <div className="home-sec-1-body-2">
-                        <img src={imageOne} alt="" />
-                    </div>
+                    <motion.div
+                        variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0 }
+                        }}
+                        initial="hidden"
+                        animate={controls}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="careerplus__feature-card"
+                    >
+                        <div className="careerplus__feature-icon">
+                            <FiBell />
+                        </div>
+                        <h4 className="careerplus__feature-title">Real-Time Job Alerts</h4>
+                        <p className="careerplus__feature-text">
+                            Get instant notifications when new jobs matching your profile are posted.
+                        </p>
+                    </motion.div>
+
+                    <motion.div
+                        variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0 }
+                        }}
+                        initial="hidden"
+                        animate={controls}
+                        transition={{ duration: 0.6, delay: 0.6 }}
+                        className="careerplus__feature-card"
+                    >
+                        <div className="careerplus__feature-icon">
+                            <FiBarChart2 />
+                        </div>
+                        <h4 className="careerplus__feature-title">Data-Driven Insights</h4>
+                        <p className="careerplus__feature-text">
+                            Understand your market value and how you compare to other candidates.
+                        </p>
+                    </motion.div>
                 </div>
             </section>
-            <section className="home-sec-2" >
-                <div className="home-sec-2-head"></div>
-                <div className="home-sec-2-body">
-                    <div className="home-sec-2-body-1">
-                        <img src={imageTwo} alt="" />
-                    </div>
-                    <div className="home-sec-2-body-2">
-                        <div className="home-sec-2-body-2-1">
-                            <h3>Career Plus</h3>
-                            <p>Making job hunting smarter and faster.</p>
-                            <h1>Smart Job Recommendations.</h1>
-                            <p>Our AI-based job recommendation system intelligently matches job seekers with the best opportunities based on their skills, experience, and preferences.</p>
 
-                            <div className="home-sec-2-body-2-1-search">
-                                <input className="home-sec-2-body-2-1-search-input" type="text" placeholder="Search Jobs...." />
-                                <button type="submit">
-                                    <i className="fas fa-search"></i>
-                                </button>
+            {/* Testimonials Section */}
+            <section id="testimonials" className="careerplus__testimonials">
+                <motion.h3
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="careerplus__section-title"
+                >
+                    What Our Users Say
+                </motion.h3>
 
+                <div className="careerplus__testimonial-container">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={testimonials[currentTestimonial].id}
+                            initial={{ opacity: 0, x: 50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -50 }}
+                            transition={{ duration: 0.5 }}
+                            className="careerplus__testimonial-card"
+                        >
+                            <div className="careerplus__testimonial-avatar">
+                                <img
+                                    src={testimonials[currentTestimonial].avatar}
+                                    alt={testimonials[currentTestimonial].name}
+                                />
                             </div>
+                            <p className="careerplus__testimonial-content">
+                                "{testimonials[currentTestimonial].content}"
+                            </p>
+                            <div className="careerplus__testimonial-author">
+                                <h4>{testimonials[currentTestimonial].name}</h4>
+                                <p>{testimonials[currentTestimonial].role}</p>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
 
-                            <button className="btn-2">About</button>
-
-
-
-                        </div>
+                    <div className="careerplus__testimonial-dots">
+                        {testimonials.map((_, index) => (
+                            <button
+                                key={index}
+                                className={`careerplus__testimonial-dot ${index === currentTestimonial ? 'active' : ''}`}
+                                onClick={() => setCurrentTestimonial(index)}
+                            />
+                        ))}
                     </div>
                 </div>
             </section>
-            <section className="home-sec-3"></section>
-            <footer className="home-foot"></footer>
-        </div>
-    )
 
-}
-export default Welcome
+            {/* CTA Section */}
+            <section className="careerplus__cta">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="careerplus__cta-content"
+                >
+                    <h3 className="careerplus__cta-title">Ready to take the next step in your career?</h3>
+                    <button className="careerplus__cta-btn">
+                        Join Now <FiArrowRight />
+                    </button>
+                </motion.div>
+            </section>
+
+            {/* Footer */}
+            <footer id="contact" className="careerplus__footer">
+                <div className="careerplus__footer-container">
+                    <div className="careerplus__footer-brand">
+                        <h3 className="careerplus__logo">CareerPlus</h3>
+                        <p className="careerplus__footer-text">
+                            AI-powered job matching for the modern professional.
+                        </p>
+                    </div>
+
+                    <div className="careerplus__footer-links">
+                        <h4 className="careerplus__footer-heading">Quick Links</h4>
+                        <a href="#home" className="careerplus__footer-link">Home</a>
+                        <a href="#features" className="careerplus__footer-link">Features</a>
+                        <a href="#testimonials" className="careerplus__footer-link">Testimonials</a>
+                        <a href="#contact" className="careerplus__footer-link">Contact</a>
+                    </div>
+
+                    <div className="careerplus__footer-contact">
+                        <h4 className="careerplus__footer-heading">Contact Us</h4>
+                        <p className="careerplus__footer-text">hello@careerplus.com</p>
+                        <p className="careerplus__footer-text">+1 (555) 123-4567</p>
+                    </div>
+
+                    <div className="careerplus__footer-social">
+                        <h4 className="careerplus__footer-heading">Follow Us</h4>
+                        <div className="careerplus__social-icons">
+                            <a href="#" className="careerplus__social-icon"><FaLinkedin /></a>
+                            <a href="#" className="careerplus__social-icon"><FaTwitter /></a>
+                            <a href="#" className="careerplus__social-icon"><FaGithub /></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="careerplus__footer-bottom">
+                    <p>&copy; {new Date().getFullYear()} CareerPlus. All rights reserved.</p>
+                </div>
+            </footer>
+        </div>
+    );
+};
+
+export default Welcome;
