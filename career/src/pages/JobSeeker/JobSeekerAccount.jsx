@@ -1,20 +1,25 @@
-import React from 'react'
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiEdit, FiSave, FiDownload, FiTrash2, FiChevronDown, FiUser, FiMail, FiLock } from 'react-icons/fi';
+import { FiEdit, FiSave, FiDownload, FiTrash2, FiUser, FiMail, FiPhone, FiLock, FiBriefcase } from 'react-icons/fi';
 import ProfileCard from '../../components/JobSeeker/ProfileCard';
-import EditableForm from '../../components/JobSeeker/EditableForm';
+import SecurityForm from '../../components/JobSeeker/SecurityForm';
 import AppliedJobList from '../../components/JobSeeker/AppliedJobList';
-import defaultProfile from '../../assets/react.svg';
+import defaultProfile from '../../assets/image-2.jpg';
 import '../../styles/pages/JobSeeker/JobSeekerAccount.css';
-
 
 const JobSeekerAccount = () => {
     const [profile, setProfile] = useState({
-        name: 'Jemal Hussen',
-        email: 'jemal.hussen@example.com',
+        firstName: 'Jamal',
+        middleName: 'Husssen',
+        lastName: 'Hassan',
+        email: 'Jamal.Hassan@example.com',
+        age: 28,
+        gender: 'Male',
+        phone: '+1 (555) 123-4567',
+        degree: 'Master of Science',
+        fieldOfStudy: 'Computer Science',
         profilePic: defaultProfile,
-        resumeUrl: '/resumes/jemal-hussen-resume.pdf'
+        resumeUrl: '/resumes/Jamal-Hassan.pdf'
     });
 
     const [appliedJobs, setAppliedJobs] = useState([
@@ -54,16 +59,15 @@ const JobSeekerAccount = () => {
     };
 
     const handleDeleteAccount = () => {
-        // Account deletion logic would go here
         console.log('Account deleted');
         setShowDeleteConfirm(false);
     };
 
     const statusColors = {
-        'Under Review': '#3b82f6', // blue
-        'Interview Scheduled': '#10b981', // green
-        'Rejected': '#ef4444', // red
-        'Offer Received': '#8b5cf6' // purple
+        'Under Review': '#3b82f6',
+        'Interview Scheduled': '#10b981',
+        'Rejected': '#ef4444',
+        'Offer Received': '#8b5cf6'
     };
 
     return (
@@ -90,7 +94,7 @@ const JobSeekerAccount = () => {
                         whileHover={{ scale: 1.03 }}
                         onClick={() => setActiveSection('applications')}
                     >
-                        <FiMail className="sidebar-icon" />
+                        <FiBriefcase className="sidebar-icon" />
                         <span>Applications</span>
                     </motion.div>
 
@@ -125,6 +129,37 @@ const JobSeekerAccount = () => {
                                     onEditToggle={() => setIsEditing(!isEditing)}
                                 />
 
+                                <div className="profile-details">
+                                    <div className="detail-row">
+                                        <span className="detail-label">Full Name:</span>
+                                        <span className="detail-value">{`${profile.firstName} ${profile.middleName} ${profile.lastName}`}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Email:</span>
+                                        <span className="detail-value">{profile.email}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Age:</span>
+                                        <span className="detail-value">{profile.age}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Gender:</span>
+                                        <span className="detail-value">{profile.gender}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Phone:</span>
+                                        <span className="detail-value">{profile.phone}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Degree:</span>
+                                        <span className="detail-value">{profile.degree}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Field of Study:</span>
+                                        <span className="detail-value">{profile.fieldOfStudy}</span>
+                                    </div>
+                                </div>
+
                                 {isEditing ? (
                                     <EditableForm
                                         profile={profile}
@@ -137,7 +172,6 @@ const JobSeekerAccount = () => {
                                             whileHover={{ scale: 1.03 }}
                                             whileTap={{ scale: 0.98 }}
                                             className="download-btn"
-                                            onClick={() => console.log('Download resume')}
                                         >
                                             <FiDownload /> Download Resume
                                         </motion.button>
@@ -158,7 +192,7 @@ const JobSeekerAccount = () => {
                                 transition={{ duration: 0.3 }}
                                 className="applications-section"
                             >
-                                <h2 className="section-title">My Applications</h2>
+                                <h2 className="section-title">My Job Applications</h2>
                                 <AppliedJobList jobs={appliedJobs} statusColors={statusColors} />
                             </motion.section>
                         )}
@@ -176,32 +210,7 @@ const JobSeekerAccount = () => {
                                 className="security-section"
                             >
                                 <h2 className="section-title">Account Security</h2>
-
-                                <div className="security-card">
-                                    <h3>Change Password</h3>
-                                    <form className="password-form">
-                                        <div className="form-group">
-                                            <label>Current Password</label>
-                                            <input type="password" />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>New Password</label>
-                                            <input type="password" />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Confirm New Password</label>
-                                            <input type="password" />
-                                        </div>
-                                        <motion.button
-                                            type="button"
-                                            whileHover={{ scale: 1.03 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="save-btn"
-                                        >
-                                            <FiSave /> Update Password
-                                        </motion.button>
-                                    </form>
-                                </div>
+                                <SecurityForm />
 
                                 <div className="danger-zone">
                                     <h3>Danger Zone</h3>

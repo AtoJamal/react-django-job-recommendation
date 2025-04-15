@@ -4,14 +4,10 @@ import imageOne from '../../assets/image-1.avif';
 import imageTwo from '../../assets/image-2.jpg';
 import imageThree from '../../assets/image-2.jpg';
 
-
-
-
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useAnimation, AnimatePresence } from 'framer-motion';
 import { FiArrowRight, FiCheckCircle, FiBell, FiBarChart2 } from 'react-icons/fi';
 import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
-
 
 
 
@@ -98,8 +94,8 @@ const Welcome = () => {
                         <a href="#features" className="careerplus__nav-link">Features</a>
                         <a href="#testimonials" className="careerplus__nav-link">Testimonials</a>
                         <a href="#contact" className="careerplus__nav-link">Contact</a>
-                        <a href="#login" className="careerplus__nav-link">Login</a>
-                        <a href="#register" className="careerplus__nav-link careerplus__nav-link--register">Register</a>
+                        <a href="/login" className="careerplus__nav-link">Login</a>
+                        <a href="/register" className="careerplus__nav-link careerplus__nav-link--register">Register</a>
                     </nav>
                 </div>
             </motion.header>
@@ -309,7 +305,7 @@ const Welcome = () => {
                     <div className="careerplus__footer-contact">
                         <h4 className="careerplus__footer-heading">Contact Us</h4>
                         <p className="careerplus__footer-text">hello@careerplus.com</p>
-                        <p className="careerplus__footer-text">+1 (555) 123-4567</p>
+                        <p className="careerplus__footer-text">+251 (9) 123-456</p>
                     </div>
 
                     <div className="careerplus__footer-social">

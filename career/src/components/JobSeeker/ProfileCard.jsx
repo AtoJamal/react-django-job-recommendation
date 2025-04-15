@@ -11,7 +11,7 @@ const ProfileCard = ({ profile, isEditing, onEditToggle }) => {
                 <div className="profile-pic-container">
                     <img
                         src={profile.profilePic}
-                        alt={profile.name}
+                        alt={`${profile.firstName} ${profile.lastName}`}
                         className="profile-pic"
                     />
                     {!isEditing && (
@@ -26,7 +26,7 @@ const ProfileCard = ({ profile, isEditing, onEditToggle }) => {
                     )}
                 </div>
                 <div className="profile-info">
-                    <h3>{profile.name}</h3>
+                    <h3>{`${profile.firstName} ${profile.lastName}`}</h3>
                     <p>{profile.email}</p>
                 </div>
             </div>

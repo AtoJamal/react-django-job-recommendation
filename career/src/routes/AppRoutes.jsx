@@ -1,17 +1,17 @@
 import { Routes, Route } from 'react-router-dom';
 import React from 'react';
+import Login from '../pages/Auto/Login';
+import Register from '../pages/Auto/Register';
 // JobSeeker Imports
 
 import Welcome from '../pages/JobSeeker/Welcome';
-import Regiter from '../pages/JobSeeker/Register';
+import JobApplication from '../pages/JobSeeker/JobApplication';
+
 import NotificationList from '../pages/JobSeeker/NotificationList';
 import NotificationDetail from '../pages/JobSeeker/NotificationDetail';
-import Login from '../pages/JobSeeker/Login';
+
 import JobSeekerAccount from '../pages/JobSeeker/JobSeekerAccount';
-import JobList from '../pages/JobSeeker/JobList';
-import JobDetail from '../pages/JobSeeker/JobDetail';
-import Register from '../pages/JobSeeker/Register';
-import RegisterJobSeeker from '../pages/JobSeeker/RegisterJobSeeker';
+import JobSearch from '../pages/JobSeeker/JobSearch';
 import Resume from '../pages/JobSeeker/Resume';
 // Employer Imports
 import EmployerApplicantList from '../pages/Employer/EmployerApplicantList';
@@ -20,7 +20,6 @@ import EmployerAccount from '../pages/Employer/EmployerAccount';
 import EmployerJobPosting from '../pages/Employer/EmployerJobPosting';
 import EmployerPostedJobDetail from '../pages/Employer/EmployerPostedJobDetail';
 import EmployerPostedJobList from '../pages/Employer/EmployerPostedJobList';
-import EmployerRegister from '../pages/Employer/EmployerRegister';
 // Admin Imports
 import AdminEmployerList from '../pages/Admin/AdminEmployerList';
 import AdminProfile from '../pages/Admin/AdminProfile';
@@ -33,7 +32,13 @@ import App from '../App';
 
 const AppRoutes = () => (
     <Routes>
-        <Route path="/" element={<JobSeekerAccount />} />
+        <Route path="/" element={<Welcome />} />
+        <Route path="/jobseekeraccount" element={<JobSeekerAccount />} />
+        <Route path="/jobsearch" element={<JobSearch />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/notificationlist" element={<NotificationList />} />
+        <Route path="/jobapplication" element={<JobApplication />} />
     </Routes>
 
 
