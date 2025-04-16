@@ -4,22 +4,24 @@ import { FiEdit, FiSave, FiDownload, FiTrash2, FiUser, FiMail, FiPhone, FiLock, 
 import ProfileCard from '../../components/JobSeeker/ProfileCard';
 import SecurityForm from '../../components/JobSeeker/SecurityForm';
 import AppliedJobList from '../../components/JobSeeker/AppliedJobList';
-import defaultProfile from '../../assets/image-2.jpg';
+import defaultProfile from '../../assets/man1.jpg';
 import '../../styles/pages/JobSeeker/JobSeekerAccount.css';
+
+import logoImage from '../../assets/image-3.png'
 
 const JobSeekerAccount = () => {
     const [profile, setProfile] = useState({
-        firstName: 'Jamal',
-        middleName: 'Husssen',
-        lastName: 'Hassan',
-        email: 'Jamal.Hassan@example.com',
+        firstName: 'Abebe',
+        middleName: 'Abebe',
+        lastName: 'Abebe',
+        email: 'abebe.Abebe@example.com',
         age: 28,
         gender: 'Male',
         phone: '+1 (555) 123-4567',
         degree: 'Master of Science',
         fieldOfStudy: 'Computer Science',
         profilePic: defaultProfile,
-        resumeUrl: '/resumes/Jamal-Hassan.pdf'
+        resumeUrl: logoImage
     });
 
     const [appliedJobs, setAppliedJobs] = useState([
@@ -29,7 +31,7 @@ const JobSeekerAccount = () => {
             company: 'TechCorp Inc.',
             appliedDate: '2023-05-15',
             status: 'Under Review',
-            logo: '/company-logos/techcorp.webp'
+            logo: logoImage
         },
         {
             id: 2,
@@ -37,7 +39,7 @@ const JobSeekerAccount = () => {
             company: 'Innovate Solutions',
             appliedDate: '2023-06-02',
             status: 'Interview Scheduled',
-            logo: '/company-logos/innovate.webp'
+            logo: logoImage
         },
         {
             id: 3,
@@ -45,7 +47,7 @@ const JobSeekerAccount = () => {
             company: 'WebCraft Studios',
             appliedDate: '2023-06-10',
             status: 'Rejected',
-            logo: '/company-logos/webcraft.webp'
+            logo: logoImage
         }
     ]);
 

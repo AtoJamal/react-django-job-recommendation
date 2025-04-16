@@ -14,12 +14,9 @@ import JobSeekerAccount from '../pages/JobSeeker/JobSeekerAccount';
 import JobSearch from '../pages/JobSeeker/JobSearch';
 import Resume from '../pages/JobSeeker/Resume';
 // Employer Imports
-import EmployerApplicantList from '../pages/Employer/EmployerApplicantList';
-import EmployerApplicantDetail from '../pages/Employer/EmployerApplicantDetail';
+
 import EmployerAccount from '../pages/Employer/EmployerAccount';
 import EmployerJobPosting from '../pages/Employer/EmployerJobPosting';
-import EmployerPostedJobDetail from '../pages/Employer/EmployerPostedJobDetail';
-import EmployerPostedJobList from '../pages/Employer/EmployerPostedJobList';
 // Admin Imports
 import AdminEmployerList from '../pages/Admin/AdminEmployerList';
 import AdminProfile from '../pages/Admin/AdminProfile';
@@ -39,6 +36,8 @@ const AppRoutes = () => (
         <Route path="/register" element={<Register />} />
         <Route path="/notificationlist" element={<NotificationList />} />
         <Route path="/jobapplication" element={<JobApplication />} />
+        <Route path="/employeraccount" element={<EmployerAccount />} />
+        <Route path="/employerjobposting" element={<EmployerJobPosting />} />
     </Routes>
 
 

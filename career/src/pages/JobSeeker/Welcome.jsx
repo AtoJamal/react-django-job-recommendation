@@ -1,8 +1,8 @@
 import React from 'react';
 import '../../styles/pages/JobSeeker/Welcome.css';
-import imageOne from '../../assets/image-1.avif';
-import imageTwo from '../../assets/image-2.jpg';
-import imageThree from '../../assets/image-2.jpg';
+import imageOne from '../../assets/image-1.jpg';
+import imageTwo from '../../assets/man1.jpg';
+import imageThree from '../../assets/man1.jpg';
 
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useAnimation, AnimatePresence } from 'framer-motion';
@@ -57,7 +57,7 @@ const Welcome = () => {
             name: "Yosef Kasse",
             role: "Marketing Manager",
             content: "The real-time alerts saved me so much time.",
-            avatar: imageOne
+            avatar: imageTwo
         }
     ];
 
