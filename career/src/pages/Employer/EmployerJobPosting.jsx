@@ -7,7 +7,7 @@ const EmployerJobPosting = () => {
         requiredAge: '',
         salary: '',
         category: 'IT',
-        graduationYear: '',
+        experience: '',
         quota: '',
         deadline: '',
         description: ''
@@ -26,7 +26,6 @@ const EmployerJobPosting = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Job Posted:', formData);
-        // Add your job posting logic here
         alert('Job posted successfully!');
     };
 
@@ -88,14 +87,14 @@ const EmployerJobPosting = () => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="graduationYear">Required Graduation Year</label>
+                        <label htmlFor="graduationYear">Required Experience Year</label>
                         <input
                             type="number"
-                            id="graduationYear"
-                            name="graduationYear"
-                            min="1900"
-                            max={new Date().getFullYear()}
-                            value={formData.graduationYear}
+                            id="experience"
+                            name="experience"
+                            min="0"
+                            max="15"
+                            value={formData.experience}
                             onChange={handleChange}
                         />
                     </div>

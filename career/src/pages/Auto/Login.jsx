@@ -15,7 +15,7 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Login logic would go here
+
         console.log('Login form submitted', formData);
     };
 

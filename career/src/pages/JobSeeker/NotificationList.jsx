@@ -33,7 +33,7 @@ const NotificationList = () => {
             id: 4,
             subject: 'System maintenance notification',
             company: 'System',
-            message: 'We will be performing scheduled maintenance this weekend. The platform will be unavailable from 2AM to 4AM EST.',
+            message: 'We will be performing scheduled maintenance this weekend. The platform will be unavailable from 2AM to 4AM EAT.',
             time: '2023-06-12T18:00:00Z',
             isRead: false
         }

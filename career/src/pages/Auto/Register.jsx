@@ -34,7 +34,7 @@ const Register = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Registration logic would go here
+        // Registration 
         console.log('Registration form submitted', { userType, hasCompany, ...formData });
     };
 

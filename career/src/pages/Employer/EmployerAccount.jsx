@@ -141,7 +141,6 @@ const EmployerAccount = () => {
     // Handle profile update - only phone number and profile picture
     const handleProfileUpdate = (e) => {
         e.preventDefault();
-        // In a real app, you would send this to your backend
         console.log("Profile updated successfully");
         setEditingProfile(false);
     };
@@ -156,7 +155,7 @@ const EmployerAccount = () => {
             )
         );
         console.log(`${action}ed applicant ${applicantId}`);
-        // In a real app, you would send this to your backend
+
     };
 
     // Toggle company modal
@@ -329,7 +328,7 @@ const EmployerAccount = () => {
                 </div>
             </section>
 
-            {/* Company Details Modal - now working */}
+            {/* Company Details Modal */}
             {showCompanyModal && (
                 <CompanyDetailModal
                     company={company}
