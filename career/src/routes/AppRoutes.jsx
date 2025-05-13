@@ -17,6 +17,7 @@ import Resume from '../pages/JobSeeker/Resume';
 
 import EmployerAccount from '../pages/Employer/EmployerAccount';
 import EmployerJobPosting from '../pages/Employer/EmployerJobPosting';
+import DepartmentForm from '../pages/Employer/DepartmentForm';
 // Admin Imports
 import AdminEmployerList from '../pages/Admin/AdminEmployerList';
 import AdminProfile from '../pages/Admin/AdminProfile';
@@ -25,12 +26,26 @@ import AdminFeedbackList from '../pages/Admin/AdminFeedbackList';
 import AdminJobSeekerList from '../pages/Admin/AdminJobSeekerList';
 import AdminPostedJobDetail from '../pages/Admin/AdminPostedJobDetail';
 import AdminPostedJobList from '../pages/Admin/AdminPostedJobList';
+
+// import ProtectedRoute
+import ProtectedRoute from '../components/ProtectedRoute';
 import App from '../App';
+
+function Logout() {
+  localStorage.clear()
+  return <Navigate to="/login" />
+}
+
+function RegisterAndLogout() {
+  localStorage.clear()
+  return <Register />
+}
+
 
 const AppRoutes = () => (
     <Routes>
         <Route path="/" element={<Welcome />} />
-        <Route path="/jobseekeraccount" element={<JobSeekerAccount />} />
+        <Route path="/jobseekeraccount" element={ <ProtectedRoute><JobSeekerAccount /></ProtectedRoute> } />
         <Route path="/jobsearch" element={<JobSearch />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -38,6 +53,7 @@ const AppRoutes = () => (
         <Route path="/jobapplication" element={<JobApplication />} />
         <Route path="/employeraccount" element={<EmployerAccount />} />
         <Route path="/employerjobposting" element={<EmployerJobPosting />} />
+        <Route path="/departmentform" element={<DepartmentForm />} />
     </Routes>
 
 
