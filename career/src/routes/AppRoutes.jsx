@@ -49,11 +49,11 @@ const AppRoutes = () => (
         <Route path="/jobsearch" element={<JobSearch />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/notificationlist" element={<NotificationList />} />
-        <Route path="/jobapplication" element={<JobApplication />} />
-        <Route path="/employeraccount" element={<EmployerAccount />} />
-        <Route path="/employerjobposting" element={<EmployerJobPosting />} />
-        <Route path="/departmentform" element={<DepartmentForm />} />
+        <Route path="/notificationlist" element={<ProtectedRoute><NotificationList /></ProtectedRoute>} />
+        <Route path="/jobapplication" element={<ProtectedRoute><JobApplication /></ProtectedRoute>} />
+        <Route path="/employeraccount" element={<ProtectedRoute><EmployerAccount /></ProtectedRoute>} />
+        <Route path="/employerjobposting" element={<ProtectedRoute><EmployerJobPosting /></ProtectedRoute>} />
+        
     </Routes>
 
 

@@ -1,23 +1,44 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Note
+from .models import Admin, Employer, JobSeeker, Job, JobApplicant, Company
 
-
-
-class UserSerializer(serializers.ModelSerializer):
+class AdminSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ["id", "username", "password"]
-        extra_kwargs = {"password": {"write_only": True}}
+        model = Admin
+        fields = '__all__'
+        extra_kwargs = {'password': {'write_only': True}}
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = '__all__'
+
+class EmployerSerializer(serializers.ModelSerializer):
+    company = CompanySerializer(required=False)
+    
+    class Meta:
+        model = Employer
+        fields = '__all__'
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        print(validated_data)
-        user = User.objects.create_user(**validated_data)
-        return user
+        company_data = validated_data.pop('company', None)
+        if company_data:
+            company = Company.objects.create(**company_data)
+            validated_data['company'] = company
+        return Employer.objects.create(**validated_data)
 
-
-class NoteSerializer(serializers.ModelSerializer):
+class JobSeekerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Note
-        fields = ["id", "title", "content", "created_at", "author"]
-        extra_kwargs = {"author": {"read_only": True}}
+        model = JobSeeker
+        fields = '__all__'
+        extra_kwargs = {'password': {'write_only': True}}
+
+class JobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = '__all__'
+
+class JobApplicantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobApplicant
+        fields = '__all__'
