@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'api',
 ]
 
@@ -55,6 +56,16 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000", 
+    "http://localhost:5173", # Your React dev server
+]
 
 ROOT_URLCONF = 'core.urls'
 
@@ -85,9 +96,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'fullstackjob',
-        'PASSWORD': '',
-        'USER':'root',
-        'HOST':'127.0.0.1',
+        'PASSWORD': 'password123',
+        'USER':'djangouser',
+        'HOST':'localhost',
         'PORT':'3306',
 
     }
@@ -134,3 +145,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "frontend/dist",  # Where React builds to
+]

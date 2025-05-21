@@ -6,15 +6,28 @@ import imageThree from '../../assets/man1.jpg';
 
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useAnimation, AnimatePresence } from 'framer-motion';
-import { FiArrowRight, FiCheckCircle, FiBell, FiBarChart2 } from 'react-icons/fi';
+import { FiArrowRight, FiCheckCircle, FiBell, FiBarChart2, FiStar, FiSun, FiMoon } from 'react-icons/fi';
 import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
-
-
 
 const Welcome = () => {
     const [scrolled, setScrolled] = useState(false);
+    const [theme, setTheme] = useState(() => {
+        // Check if theme is stored in localStorage
+        const savedTheme = localStorage.getItem('theme');
+        // Check system preference if no saved theme
+        if (!savedTheme) {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return savedTheme;
+    });
     const controls = useAnimation();
     const { scrollY } = useScroll();
+
+    // Update theme when it changes
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -37,27 +50,34 @@ const Welcome = () => {
         });
     }, [scrollY, controls]);
 
+    const toggleTheme = () => {
+        setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    };
+
     const testimonials = [
         {
             id: 1,
             name: "Jemal Hussen",
             role: "UX Designer",
             content: "CareerPlus helped me find my dream job in just 2 weeks! The AI recommendations were spot on.",
-            avatar: imageTwo
+            avatar: imageTwo,
+            rating: 5
         },
         {
             id: 2,
             name: "Telehaymanot Wale",
             role: "Software Engineer",
             content: "I was getting frustrated with traditional job boards. CareerPlus understands what I'm looking for.",
-            avatar: imageThree
+            avatar: imageThree,
+            rating: 5
         },
         {
             id: 3,
             name: "Yosef Kasse",
             role: "Marketing Manager",
             content: "The real-time alerts saved me so much time.",
-            avatar: imageTwo
+            avatar: imageTwo,
+            rating: 5
         }
     ];
 
@@ -75,8 +95,12 @@ const Welcome = () => {
             {/* Header */}
             <motion.header
                 className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
-                initial={{ backgroundColor: 'rgba(255, 255, 255, 0)' }}
-                animate={{ backgroundColor: scrolled ? 'rgb(255, 255, 255)' : 'rgba(255, 255, 255, 0)' }}
+                initial={{ backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)' }}
+                animate={{ 
+                    backgroundColor: scrolled 
+                        ? (theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)')
+                        : (theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)')
+                }}
                 transition={{ duration: 0.3 }}
             >
                 <div className="careerplus__header-container">
@@ -96,12 +120,20 @@ const Welcome = () => {
                         <a href="#contact" className="careerplus__nav-link">Contact</a>
                         <a href="/login" className="careerplus__nav-link">Login</a>
                         <a href="/register" className="careerplus__nav-link careerplus__nav-link--register">Register</a>
+                        <button 
+                            className="careerplus__theme-toggle"
+                            onClick={toggleTheme}
+                            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+                        >
+                            {theme === 'light' ? <FiMoon /> : <FiSun />}
+                        </button>
                     </nav>
                 </div>
             </motion.header>
 
             {/* Hero Section */}
-            <section id="home" className="careerplus__hero">
+            <section id="home" className="careerplus__hero"
+                style={theme === 'dark' ? { background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' } : {}}>
                 <div className="careerplus__hero-content">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
@@ -245,6 +277,11 @@ const Welcome = () => {
                                     src={testimonials[currentTestimonial].avatar}
                                     alt={testimonials[currentTestimonial].name}
                                 />
+                            </div>
+                            <div className="careerplus__testimonial-rating">
+                                {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
+                                    <FiStar key={i} className="careerplus__testimonial-star" />
+                                ))}
                             </div>
                             <p className="careerplus__testimonial-content">
                                 "{testimonials[currentTestimonial].content}"

@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '../../styles/pages/Jobseeker/Register.css';
+import { Link, useNavigate } from 'react-router-dom';
+import '../../styles/pages/JobSeeker/Register.css';
+import api from '../../api';
 
 const Register = () => {
+    const navigate = useNavigate();
     const [userType, setUserType] = useState('jobSeeker');
     const [hasCompany, setHasCompany] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '',
         middleName: '',
@@ -27,15 +31,118 @@ const Register = () => {
         establishmentYear: ''
     });
 
+    const GENDER_CHOICES = [
+        { value: 'Male', label: 'Male' },
+        { value: 'Female', label: 'Female' },
+        { value: 'Other', label: 'Other' },
+        { value: 'prefer-not-to-say', label: 'Prefer not to say' }
+    ];
+
+    const DEGREE_CHOICES = [
+        { value: 'Bachelor', label: 'Bachelor' },
+        { value: 'Master', label: 'Master' },
+        { value: 'PhD', label: 'PhD' },
+        { value: 'Diploma', label: 'Diploma' }
+    ];
+
+    const FIELD_OF_STUDY_CHOICES = [
+        { value: 'Computer Science', label: 'Computer Science' },
+        { value: 'Engineering', label: 'Engineering' },
+        { value: 'Business', label: 'Business' },
+        { value: 'Arts', label: 'Arts' },
+        { value: 'Medicine', label: 'Medicine' }
+    ];
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Registration 
-        console.log('Registration form submitted', { userType, hasCompany, ...formData });
+        setError('');
+        setLoading(true);
+
+        try {
+            // Prepare the data based on user type
+            const submitData = {
+                first_name: formData.firstName,
+                middle_name: formData.middleName || null, // Send null if empty string
+                last_name: formData.lastName,
+                age: parseInt(formData.age) || null,
+                gender: formData.gender,
+                location: formData.location,
+                phone_number: formData.phone,
+                email: formData.email,
+                password: formData.password,
+                is_email_verified: false
+            };
+
+            if (userType === 'jobSeeker') {
+                // Add job seeker specific fields
+                submitData.degree = formData.degree;
+                submitData.experience = parseInt(formData.experience) || 0;
+                submitData.graduation_year = parseInt(formData.graduationYear);
+                submitData.field_of_study = formData.fieldOfStudy;
+
+                const response = await api.createJobSeeker(submitData);
+                if (response.data) {
+                    navigate('/login', { state: { success: 'Registration successful! Please login.' } });
+                }
+            } else {
+                // Add employer specific fields
+                if (hasCompany) {
+                    submitData.company = {
+                        name: formData.companyName,
+                        location: formData.companyLocation,
+                        number_of_employees: parseInt(formData.employeesCount) || null,
+                        year_established: parseInt(formData.establishmentYear) || null
+                    };
+                }
+
+                const response = await api.createEmployer(submitData);
+                if (response.data) {
+                    navigate('/login', { state: { success: 'Registration successful! Please login.' } });
+                }
+            }
+        } 
+        catch (err) {
+            console.error('Full error object:', err);
+            
+            // Network errors (no response from server)
+            if (err.message === "Network Error") {
+                setError('Cannot connect to server. Check:');
+                setError(prev => prev + '\n1. Is Django running?');
+                setError(prev => prev + '\n2. Check browser console for CORS errors');
+                return;
+            }
+        
+            // Backend returned error response (4xx/5xx)
+            if (err.response) {
+                const errorData = err.response.data;
+                
+                // Django validation errors (400 Bad Request)
+                if (err.response.status === 400) {
+                    if (typeof errorData === 'object') {
+                        // Handle field errors like {"email": ["This field is required"]}
+                        const firstError = Object.entries(errorData)[0];
+                        setError(`${firstError[0]}: ${firstError[1][0]}`);
+                    } else {
+                        setError(errorData.detail || 'Invalid data submitted');
+                    }
+                }
+                // Other HTTP errors
+                else {
+                    setError(errorData.detail || `Server error (${err.response.status})`);
+                }
+                return;
+            }
+        
+            // All other cases
+            setError('Unknown error occurred. Check console for details');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -43,6 +150,8 @@ const Register = () => {
             <div className="auth-card">
                 <h1 className="auth-title">Create Account</h1>
                 <p className="auth-subtitle">Join us as a...</p>
+
+                {error && <div className="error-message">{error}</div>}
 
                 <div className="user-type-toggle">
                     <button
@@ -62,7 +171,7 @@ const Register = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
-                    {/* Common Fields */}
+                    {/* Common Fields - Now including middleName and lastName for all user types */}
                     <div className="form-row">
                         <div className="form-group">
                             <label htmlFor="firstName">First Name</label>
@@ -77,7 +186,7 @@ const Register = () => {
                             />
                         </div>
 
-                        {userType === 'jobSeeker' && (
+                        {/* Middle Name field - Now always rendered */}
                             <div className="form-group">
                                 <label htmlFor="middleName">Middle Name</label>
                                 <input
@@ -89,10 +198,9 @@ const Register = () => {
                                     placeholder="Middle name (optional)"
                                 />
                             </div>
-                        )}
                     </div>
 
-                    {userType === 'jobSeeker' && (
+                    {/* Last Name field - Now always rendered */}
                         <div className="form-group">
                             <label htmlFor="lastName">Last Name</label>
                             <input
@@ -105,7 +213,6 @@ const Register = () => {
                                 placeholder="Last name"
                             />
                         </div>
-                    )}
 
                     <div className="form-row">
                         <div className="form-group">
@@ -132,10 +239,11 @@ const Register = () => {
                                 required
                             >
                                 <option value="">Select gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                                <option value="prefer-not-to-say">Prefer not to say</option>
+                                {GENDER_CHOICES.map(choice => (
+                                    <option key={choice.value} value={choice.value}>
+                                        {choice.label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -171,15 +279,20 @@ const Register = () => {
                         <>
                             <div className="form-group">
                                 <label htmlFor="degree">Highest Degree</label>
-                                <input
-                                    type="text"
+                                <select
                                     id="degree"
                                     name="degree"
                                     value={formData.degree}
                                     onChange={handleChange}
                                     required
-                                    placeholder="e.g. Bachelor of Science"
-                                />
+                                >
+                                    <option value="">Select degree</option>
+                                    {DEGREE_CHOICES.map(choice => (
+                                        <option key={choice.value} value={choice.value}>
+                                            {choice.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="form-row">
@@ -213,15 +326,20 @@ const Register = () => {
 
                             <div className="form-group">
                                 <label htmlFor="fieldOfStudy">Field of Study</label>
-                                <input
-                                    type="text"
+                                <select
                                     id="fieldOfStudy"
                                     name="fieldOfStudy"
                                     value={formData.fieldOfStudy}
                                     onChange={handleChange}
                                     required
-                                    placeholder="e.g. Computer Science"
-                                />
+                                >
+                                    <option value="">Select field of study</option>
+                                    {FIELD_OF_STUDY_CHOICES.map(choice => (
+                                        <option key={choice.value} value={choice.value}>
+                                            {choice.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </>
                     )}
@@ -329,7 +447,13 @@ const Register = () => {
                         <p className="password-hint">Minimum 8 characters</p>
                     </div>
 
-                    <button type="submit" className="auth-button">Create Account</button>
+                    <button 
+                        type="submit" 
+                        className="auth-button"
+                        disabled={loading}
+                    >
+                        {loading ? 'Creating Account...' : 'Create Account'}
+                    </button>
                 </form>
 
                 <div className="auth-footer">

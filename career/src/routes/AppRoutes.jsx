@@ -29,6 +29,7 @@ import AdminPostedJobList from '../pages/Admin/AdminPostedJobList';
 
 // import ProtectedRoute
 import ProtectedRoute from '../components/ProtectedRoute';
+import JobSeekersList from '../testJobSeekersList';
 import App from '../App';
 
 function Logout() {
@@ -45,15 +46,15 @@ function RegisterAndLogout() {
 const AppRoutes = () => (
     <Routes>
         <Route path="/" element={<Welcome />} />
-        <Route path="/jobseekeraccount" element={ <ProtectedRoute><JobSeekerAccount /></ProtectedRoute> } />
+        <Route path="/jobseekeraccount" element={ <JobSeekerAccount />} />
         <Route path="/jobsearch" element={<JobSearch />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/notificationlist" element={<ProtectedRoute><NotificationList /></ProtectedRoute>} />
         <Route path="/jobapplication" element={<ProtectedRoute><JobApplication /></ProtectedRoute>} />
-        <Route path="/employeraccount" element={<ProtectedRoute><EmployerAccount /></ProtectedRoute>} />
+        <Route path="/employeraccount" element={<EmployerAccount />} />
         <Route path="/employerjobposting" element={<ProtectedRoute><EmployerJobPosting /></ProtectedRoute>} />
-        
+        <Route path="/jobseekerslist" element={<JobSeekersList />} />
     </Routes>
 
 
