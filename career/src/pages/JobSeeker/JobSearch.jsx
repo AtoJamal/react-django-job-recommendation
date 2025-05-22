@@ -1,8 +1,44 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { FiUser, FiBell, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
+import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
 import '../../styles/pages/JobSeeker/JobSearch.css';
 
 const JobSearch = () => {
+    // Theme logic
+    const [scrolled, setScrolled] = useState(false);
+    const [theme, setTheme] = useState(() => {
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme) {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return savedTheme;
+    });
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                setScrolled(true);
+            } else {
+                setScrolled(false);
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+    const toggleTheme = () => {
+        setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    };
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        navigate('/');
+    };
+
     // Mock job data
     const [jobs, setJobs] = useState([
         {
@@ -76,9 +112,53 @@ const JobSearch = () => {
     };
 
     return (
+        <div className={`careerplus-jobsearch-root ${theme}`}>
+            {/* Header */}
+            <motion.header
+                className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
+                initial={{ backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)' }}
+                animate={{
+                    backgroundColor: scrolled
+                        ? (theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)')
+                        : (theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)')
+                }}
+                transition={{ duration: 0.3 }}
+            >
+                <div className="careerplus__header-container">
+                    <motion.h1
+                        className="careerplus__logo"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        CareerPlus
+                    </motion.h1>
+                    <nav className="careerplus__nav">
+                        <button className="careerplus__nav-icon" title="Notifications" onClick={() => navigate('/notificationlist')}>
+                            <FiBell />
+                        </button>
+                        <button className="careerplus__nav-icon" title="Account" onClick={() => navigate('/jobseekeraccount')}>
+                            <FiUser />
+                        </button>
+                        <button className="careerplus__nav-icon" title="Logout" onClick={handleLogout}>
+                            <FiLogOut />
+                        </button>
+                        <button
+                            className="careerplus__theme-toggle"
+                            onClick={toggleTheme}
+                            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+                        >
+                            {theme === 'light' ? <FiMoon /> : <FiSun />}
+                        </button>
+                    </nav>
+                </div>
+            </motion.header>
+
+            {/* Main Content */}
+            <main className="careerplus-jobsearch-main">
         <div className="job-search-page">
             <div className="search-container">
-                <h1>AI Based Job Recommendation</h1>
+                        <h1>Find Your Dream Job</h1>
                 <div className="search-bar">
                     <input
                         type="text"
@@ -101,23 +181,23 @@ const JobSearch = () => {
                             <div className="job-card-body">
                                 <div className="job-info">
                                     <div className="info-item">
-                                        <span className="info-label">Location:</span>
+                                                <span className="info-label">Location</span>
                                         <span>{job.location}</span>
                                     </div>
                                     <div className="info-item">
-                                        <span className="info-label">Posted:</span>
+                                                <span className="info-label">Posted</span>
                                         <span>{formatDate(job.postedDate)}</span>
                                     </div>
                                     <div className="info-item">
-                                        <span className="info-label">Salary:</span>
+                                                <span className="info-label">Salary</span>
                                         <span>{job.salary}</span>
                                     </div>
                                     <div className="info-item">
-                                        <span className="info-label">Category:</span>
+                                                <span className="info-label">Category</span>
                                         <span className="category-tag">{job.category}</span>
                                     </div>
                                     <div className="info-item">
-                                        <span className="info-label">Deadline:</span>
+                                                <span className="info-label">Deadline</span>
                                         <span>{formatDate(job.deadline)}</span>
                                     </div>
                                 </div>
@@ -147,27 +227,27 @@ const JobSearch = () => {
 
                         <div className="detail-section">
                             <div className="detail-row">
-                                <span className="detail-label">Job ID:</span>
+                                        <span className="detail-label">Job ID</span>
                                 <span>{selectedJob.id}</span>
                             </div>
                             <div className="detail-row">
-                                <span className="detail-label">Location:</span>
+                                        <span className="detail-label">Location</span>
                                 <span>{selectedJob.location}</span>
                             </div>
                             <div className="detail-row">
-                                <span className="detail-label">Required Experience:</span>
+                                        <span className="detail-label">Required Experience</span>
                                 <span>{selectedJob.requiredYear}</span>
                             </div>
                             <div className="detail-row">
-                                <span className="detail-label">Positions Available:</span>
+                                        <span className="detail-label">Positions Available</span>
                                 <span>{selectedJob.quota}</span>
                             </div>
                             <div className="detail-row">
-                                <span className="detail-label">Salary Range:</span>
+                                        <span className="detail-label">Salary Range</span>
                                 <span>{selectedJob.salary}</span>
                             </div>
                             <div className="detail-row">
-                                <span className="detail-label">Application Deadline:</span>
+                                        <span className="detail-label">Application Deadline</span>
                                 <span>{formatDate(selectedJob.deadline)}</span>
                             </div>
                         </div>
@@ -186,6 +266,46 @@ const JobSearch = () => {
                     </div>
                 </div>
             )}
+                </div>
+            </main>
+
+            {/* Footer */}
+            <motion.footer id="contact" className="careerplus__footer"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+            >
+                <div className="careerplus__footer-container">
+                    <div className="careerplus__footer-brand">
+                        <h3 className="careerplus__logo">CareerPlus</h3>
+                        <p className="careerplus__footer-text">
+                            AI-powered job matching for the modern professional.
+                        </p>
+                    </div>
+                    <div className="careerplus__footer-links">
+                        <h4 className="careerplus__footer-heading">Quick Links</h4>
+                        <a href="/" className="careerplus__footer-link">Home</a>
+                        <a href="/jobseekeraccount" className="careerplus__footer-link">Account</a>
+                        <a href="/notificationlist" className="careerplus__footer-link">Notifications</a>
+                    </div>
+                    <div className="careerplus__footer-contact">
+                        <h4 className="careerplus__footer-heading">Contact Us</h4>
+                        <p className="careerplus__footer-text">hello@careerplus.com</p>
+                        <p className="careerplus__footer-text">+251 (9) 123-456</p>
+                    </div>
+                    <div className="careerplus__footer-social">
+                        <h4 className="careerplus__footer-heading">Follow Us</h4>
+                        <div className="careerplus__social-icons">
+                            <a href="#" className="careerplus__social-icon"><FaLinkedin /></a>
+                            <a href="#" className="careerplus__social-icon"><FaTwitter /></a>
+                            <a href="#" className="careerplus__social-icon"><FaGithub /></a>
+                        </div>
+                    </div>
+                </div>
+                <div className="careerplus__footer-bottom">
+                    <p>&copy; {new Date().getFullYear()} CareerPlus. All rights reserved.</p>
+                </div>
+            </motion.footer>
         </div>
     );
 };

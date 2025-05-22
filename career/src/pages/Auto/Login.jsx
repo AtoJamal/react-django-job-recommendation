@@ -57,7 +57,7 @@ const Login = () => {
             let response;
             if (userType === 'jobseeker') {
                 response = await api.loginJobSeeker(formData);
-                window.location.href = 'http://localhost:5173/jobseekeraccount';
+                window.location.href = 'http://localhost:5173/jobsearch';
             } else {
                 response = await api.loginEmployer(formData);
                 window.location.href = 'http://localhost:5173/employeraccount';

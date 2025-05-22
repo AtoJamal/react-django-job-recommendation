@@ -53,7 +53,7 @@ const AppRoutes = () => (
         <Route path="/notificationlist" element={<ProtectedRoute><NotificationList /></ProtectedRoute>} />
         <Route path="/jobapplication" element={<ProtectedRoute><JobApplication /></ProtectedRoute>} />
         <Route path="/employeraccount" element={<EmployerAccount />} />
-        <Route path="/employerjobposting" element={<ProtectedRoute><EmployerJobPosting /></ProtectedRoute>} />
+        <Route path="/employerjobposting" element={<EmployerJobPosting />} />
         <Route path="/jobseekerslist" element={<JobSeekersList />} />
     </Routes>
 
