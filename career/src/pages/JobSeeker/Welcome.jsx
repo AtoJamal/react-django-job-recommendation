@@ -25,7 +25,11 @@ const Welcome = () => {
 
     // Update theme when it changes
     useEffect(() => {
-        document.documentElement.setAttribute('data-theme', theme);
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
         localStorage.setItem('theme', theme);
     }, [theme]);
 
@@ -91,7 +95,7 @@ const Welcome = () => {
     }, [testimonials.length]);
 
     return (
-        <div className="careerplus">
+        <div className={`careerplus ${theme === 'dark' ? 'dark' : ''}`}>
             {/* Header */}
             <motion.header
                 className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}

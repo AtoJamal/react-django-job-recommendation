@@ -99,22 +99,26 @@
 
 /* Footer Styles */
 .careerplus__footer {
-    background: var(--register-card-bg-light);
-    border-top: 1px solid var(--register-card-border-light);
-    padding: 4rem 2rem 2rem;
-    margin-top: 4rem;
+    background: var(--jobsearch-footer-bg-light);
+    border-top: 1.5px solid var(--jobsearch-footer-border-light);
+    padding: 4rem 0 2rem;
+    width: 100%;
+    position: relative;
+    z-index: 10;
+    margin-top: auto;
 }
 
-.careerplus__root.dark .careerplus__footer {
-    background: var(--register-card-bg-dark);
-    border-top: 1px solid var(--register-card-border-dark);
+.careerplus-register-root.dark .careerplus__footer {
+    background: var(--jobsearch-footer-bg-dark);
+    border-top: 1.5px solid var(--jobsearch-footer-border-dark);
 }
 
 .careerplus__footer-container {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 2rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 3rem;
 }
 
@@ -125,55 +129,39 @@
 }
 
 .careerplus__footer-text {
-    color: var(--register-subtitle-light);
+    color: var(--jobsearch-subtitle-light);
     line-height: 1.6;
 }
 
-.careerplus__root.dark .careerplus__footer-text {
-    color: var(--register-subtitle-dark);
+.careerplus-register-root.dark .careerplus__footer-text {
+    color: var(--jobsearch-subtitle-dark);
 }
 
 .careerplus__footer-heading {
-    color: var(--register-title-light);
+    color: var(--jobsearch-title-light);
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 1rem;
 }
 
-.careerplus__root.dark .careerplus__footer-heading {
-    color: var(--register-title-dark);
-}
-
-.careerplus__footer-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
+.careerplus-register-root.dark .careerplus__footer-heading {
+    color: var(--jobsearch-title-dark);
 }
 
 .careerplus__footer-link {
-    color: var(--register-subtitle-light);
+    color: var(--jobsearch-subtitle-light);
     text-decoration: none;
-    transition: color 0.3s;
+    display: block;
+    margin-bottom: 0.75rem;
+    transition: color 0.2s;
 }
 
-.careerplus__root.dark .careerplus__footer-link {
-    color: var(--register-subtitle-dark);
+.careerplus-register-root.dark .careerplus__footer-link {
+    color: var(--jobsearch-subtitle-dark);
 }
 
 .careerplus__footer-link:hover {
-    color: var(--register-link);
-}
-
-.careerplus__footer-contact {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-}
-
-.careerplus__footer-social {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    color: var(--jobsearch-link);
 }
 
 .careerplus__social-icons {
@@ -182,43 +170,42 @@
 }
 
 .careerplus__social-icon {
-    color: var(--register-subtitle-light);
+    color: var(--jobsearch-subtitle-light);
     font-size: 1.5rem;
-    transition: all 0.3s;
+    transition: color 0.2s;
 }
 
-.careerplus__root.dark .careerplus__social-icon {
-    color: var(--register-subtitle-dark);
+.careerplus-register-root.dark .careerplus__social-icon {
+    color: var(--jobsearch-subtitle-dark);
 }
 
 .careerplus__social-icon:hover {
-    color: var(--register-link);
-    transform: translateY(-3px);
+    color: var(--jobsearch-link);
 }
 
 .careerplus__footer-bottom {
     max-width: 1200px;
     margin: 3rem auto 0;
-    padding-top: 2rem;
-    border-top: 1px solid var(--register-card-border-light);
+    padding: 2rem 2rem 0;
+    border-top: 1px solid var(--jobsearch-footer-border-light);
     text-align: center;
-    color: var(--register-subtitle-light);
+    color: var(--jobsearch-subtitle-light);
 }
 
-.careerplus__root.dark .careerplus__footer-bottom {
-    border-top: 1px solid var(--register-card-border-dark);
-    color: var(--register-subtitle-dark);
+.careerplus-register-root.dark .careerplus__footer-bottom {
+    border-top-color: var(--jobsearch-footer-border-dark);
+    color: var(--jobsearch-subtitle-dark);
 }
 
 .careerplus-register-root {
     min-height: 100vh;
-    width: 100vw;
-    background: var(--register-bg-light);
     display: flex;
     flex-direction: column;
+    background: var(--jobsearch-bg-light);
 }
+
 .careerplus-register-root.dark {
-    background: var(--register-bg-dark);
+    background: var(--jobsearch-bg-dark);
 }
 
 .careerplus-register-main {
