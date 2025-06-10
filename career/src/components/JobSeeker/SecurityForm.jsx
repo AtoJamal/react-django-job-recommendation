@@ -38,7 +38,7 @@ const SecurityForm = () => {
             return;
         }
 
-        // Submit logic would go here
+        
         console.log('Password changed successfully');
         setFormData({
             oldPassword: '',

@@ -137,7 +137,7 @@ const Register = () => {
             };
 
             if (userType === 'jobSeeker') {
-                // Add job seeker specific fields
+                
                 submitData.degree = formData.degree;
                 submitData.experience = parseInt(formData.experience) || 0;
                 submitData.graduation_year = parseInt(formData.graduationYear);
@@ -148,7 +148,7 @@ const Register = () => {
                     navigate('/login', { state: { success: 'Registration successful! Please login.' } });
                 }
             } else {
-                // Add employer specific fields
+                
                 if (hasCompany) {
                     submitData.company = {
                         name: formData.companyName,
