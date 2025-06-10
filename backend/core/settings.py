@@ -139,9 +139,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "django-backend-k2dm.onrender.com",
+    "https://react-fronted.onrender.com"
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
-    "http://localhost:5173", # Your React dev server
+    "http://localhost:5173",
+    "django-backend-k2dm.onrender.com",
+    "https://react-fronted.onrender.com" # Your React dev server
 ]
