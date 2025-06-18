@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -5,7 +6,16 @@ import { FiUser, FiBell, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
 import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
 import '../../styles/pages/JobSeeker/JobSearch.css';
 
+import api from '../../api';
+
 const JobSearch = () => {
+    const [jobs, setJobs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedJob, setSelectedJob] = useState(null);
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const navigate = useNavigate();
+
     // Theme logic
     const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState(() => {
@@ -33,69 +43,39 @@ const JobSearch = () => {
     const toggleTheme = () => {
         setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
     };
-    const navigate = useNavigate();
+    
     const handleLogout = () => {
         localStorage.removeItem('user');
         navigate('/');
     };
 
-    // Mock job data
-    const [jobs, setJobs] = useState([
-        {
-            id: 1,
-            title: 'Frontend Developer',
-            company: 'TechCorp Inc.',
-            location: 'Addis Ababa, (Remote)',
-            postedDate: '2023-06-15',
-            salary: '$9,000 - $12,000',
-            category: 'Software Development',
-            deadline: '2023-07-15',
-            description: 'We are looking for an experienced Frontend Developer to join our team. You will be responsible for building user interfaces using React.js and implementing responsive designs.',
-            requiredYear: '3+ years',
-            quota: 2
-        },
-        {
-            id: 2,
-            title: 'UX Designer',
-            company: 'Creative Solutions',
-            location: 'Dessie, ALM',
-            postedDate: '2023-06-10',
-            salary: '$8,000 - $11,000',
-            category: 'Design',
-            deadline: '2023-07-10',
-            description: 'Join our design team to create beautiful and functional user experiences. You will work closely with product managers and developers to implement design systems.',
-            requiredYear: '2+ years',
-            quota: 1
-        },
-        {
-            id: 3,
-            title: 'Data Scientist',
-            company: 'Analytics Pro',
-            location: 'Gondar, Maraki',
-            postedDate: '2023-06-05',
-            salary: '$100,000 - $140,000',
-            category: 'Data Science',
-            deadline: '2023-07-05',
-            description: 'Seeking a Data Scientist to analyze complex datasets and build predictive models. Python and machine learning experience required.',
-            requiredYear: '4+ years',
-            quota: 3
-        }
-    ]);
+    // Fetch jobs from API
+    useEffect(() => {
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      const response = await api.getJobs(searchTerm);
+      setJobs(response.data);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedJob, setSelectedJob] = useState(null);
-    const [isDetailOpen, setIsDetailOpen] = useState(false);
+  // Simple debounce
+  const timer = setTimeout(fetchJobs, 300);
+  return () => clearTimeout(timer);
+}, [searchTerm]);
 
-    const filteredJobs = jobs.filter(job =>
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
+    // Format date from backend
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
     };
 
+    
     const showJobDetails = (job) => {
         setSelectedJob(job);
         setIsDetailOpen(true);
@@ -103,16 +83,16 @@ const JobSearch = () => {
 
     const closeJobDetails = () => {
         setIsDetailOpen(false);
-        setTimeout(() => setSelectedJob(null), 300); // Wait for animation to complete
+        setTimeout(() => setSelectedJob(null), 300);
     };
 
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
     };
 
     return (
         <div className={`careerplus-jobsearch-root ${theme}`}>
+
             {/* Header */}
             <motion.header
                 className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
@@ -154,122 +134,142 @@ const JobSearch = () => {
                 </div>
             </motion.header>
 
-            {/* Main Content */}
             <main className="careerplus-jobsearch-main">
-        <div className="job-search-page">
-            <div className="search-container">
+                <div className="job-search-page">
+                    <div className="search-container">
                         <h1>Find Your Dream Job</h1>
-                <div className="search-bar">
-                    <input
-                        type="text"
-                        placeholder="Search by job title, company, or category..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                    />
-                    <button className="search-button">Search</button>
-                </div>
-            </div>
+                        <div className="search-bar">
+                            <input
+                                type="text"
+                                placeholder="Search by job title, company, or category..."
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                            />
+                        </div>
+                    </div>
 
-            <div className="job-listings">
-                {filteredJobs.length > 0 ? (
-                    filteredJobs.map(job => (
-                        <div key={job.id} className="job-card">
-                            <div className="job-card-header">
-                                <h2>{job.title}</h2>
-                                <span className="company-name">{job.company}</span>
-                            </div>
-                            <div className="job-card-body">
-                                <div className="job-info">
-                                    <div className="info-item">
-                                                <span className="info-label">Location</span>
-                                        <span>{job.location}</span>
+                    {loading ? (
+                        <div className="loading-spinner">
+                            {/* Add loading spinner */}
+                            Loading jobs...
+                        </div>
+                    ) : (
+                        <div className="job-listings">
+                            {jobs.length > 0 ? (
+                                jobs.map(job => (
+                                    <div key={job.id} className="job-card">
+                                        <div className="job-card-header">
+                                            <h2>{job.job_title}</h2>
+                                            <span className="company-name">
+                                                {job.employer_name || 'Unknown Company'}
+                                            </span>
+                                        </div>
+                                        <div className="job-card-body">
+                                            <div className="job-info">
+                                                <div className="info-item">
+                                                    <span className="info-label">Location</span>
+                                                    <span>{job.location || 'Not specified'}</span>
+                                                </div>
+                                                <div className="info-item">
+                                                    <span className="info-label">Posted</span>
+                                                    <span>{formatDate(job.posted_date)}</span>
+                                                </div>
+                                                <div className="info-item">
+                                                    <span className="info-label">Salary</span>
+                                                    <span>
+                                                        {job.salary ? `$${job.salary}` : 'Negotiable'}
+                                                    </span>
+                                                </div>
+                                                <div className="info-item">
+                                                    <span className="info-label">Category</span>
+                                                    <span className="category-tag">
+                                                        {job.category || 'Other'}
+                                                    </span>
+                                                </div>
+                                                <div className="info-item">
+                                                    <span className="info-label">Deadline</span>
+                                                    <span>{formatDate(job.deadline)}</span>
+                                                </div>
+                                            </div>
+                                            <button
+                                                className="details-button"
+                                                onClick={() => showJobDetails(job)}
+                                            >
+                                                View Details
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="info-item">
-                                                <span className="info-label">Posted</span>
-                                        <span>{formatDate(job.postedDate)}</span>
+                                ))
+                            ) : (
+                                <div className="no-results">
+                                    <p>No jobs found matching your search criteria.</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Job Details Modal */}
+                    {selectedJob && (
+                        <div className={`job-details-modal ${isDetailOpen ? 'open' : ''}`}>
+                            <div className="modal-content">
+                                <button className="close-button" onClick={closeJobDetails}>×</button>
+                                <h2>{selectedJob.job_title}</h2>
+                                <h3>{selectedJob.employer_name || 'Unknown Company'}</h3>
+
+                                <div className="detail-section">
+                                    <div className="detail-row">
+                                        <span className="detail-label">Job ID</span>
+                                        <span>{selectedJob.id}</span>
                                     </div>
-                                    <div className="info-item">
-                                                <span className="info-label">Salary</span>
-                                        <span>{job.salary}</span>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Required Gender</span>
+                                        <span>{selectedJob.required_gender || 'Any'}</span>
                                     </div>
-                                    <div className="info-item">
-                                                <span className="info-label">Category</span>
-                                        <span className="category-tag">{job.category}</span>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Required Experience</span>
+                                        <span>
+                                            {selectedJob.required_year || 'Not specified'}
+                                        </span>
                                     </div>
-                                    <div className="info-item">
-                                                <span className="info-label">Deadline</span>
-                                        <span>{formatDate(job.deadline)}</span>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Positions Available</span>
+                                        <span>{selectedJob.quota || 1}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Salary</span>
+                                        <span>
+                                            {selectedJob.salary ? `$${selectedJob.salary}` : 'Negotiable'}
+                                        </span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Deadline</span>
+                                        <span>{formatDate(selectedJob.deadline)}</span>
                                     </div>
                                 </div>
-                                <button
-                                    className="details-button"
-                                    onClick={() => showJobDetails(job)}
-                                >
-                                    View Details
-                                </button>
+
+                                <div className="description-section">
+                                    <h4>Job Description</h4>
+                                    <p>{selectedJob.description || 'No description provided.'}</p>
+                                </div>
+
+                                <div className="modal-actions">
+                                    <button 
+                                        className="apply-button"
+                                        onClick={() => navigate(`/jobapplication/${selectedJob.id}`)}
+                                    >
+                                        Apply Now
+                                    </button>
+                                    <button className="cancel-button" onClick={closeJobDetails}>
+                                        Close
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    ))
-                ) : (
-                    <div className="no-results">
-                        <p>No jobs found matching your search criteria.</p>
-                    </div>
-                )}
-            </div>
-
-            {/* Job Details Modal */}
-            {selectedJob && (
-                <div className={`job-details-modal ${isDetailOpen ? 'open' : ''}`}>
-                    <div className="modal-content">
-                        <button className="close-button" onClick={closeJobDetails}>×</button>
-                        <h2>{selectedJob.title}</h2>
-                        <h3>{selectedJob.company}</h3>
-
-                        <div className="detail-section">
-                            <div className="detail-row">
-                                        <span className="detail-label">Job ID</span>
-                                <span>{selectedJob.id}</span>
-                            </div>
-                            <div className="detail-row">
-                                        <span className="detail-label">Location</span>
-                                <span>{selectedJob.location}</span>
-                            </div>
-                            <div className="detail-row">
-                                        <span className="detail-label">Required Experience</span>
-                                <span>{selectedJob.requiredYear}</span>
-                            </div>
-                            <div className="detail-row">
-                                        <span className="detail-label">Positions Available</span>
-                                <span>{selectedJob.quota}</span>
-                            </div>
-                            <div className="detail-row">
-                                        <span className="detail-label">Salary Range</span>
-                                <span>{selectedJob.salary}</span>
-                            </div>
-                            <div className="detail-row">
-                                        <span className="detail-label">Application Deadline</span>
-                                <span>{formatDate(selectedJob.deadline)}</span>
-                            </div>
-                        </div>
-
-                        <div className="description-section">
-                            <h4>Job Description</h4>
-                            <p>{selectedJob.description}</p>
-                        </div>
-
-                        <div className="modal-actions">
-                            <Link to='/jobapplication'>
-                                <button className="apply-button">Apply Now</button>
-                            </Link>
-                            <button className="cancel-button" onClick={closeJobDetails}>Close</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                    )}
                 </div>
             </main>
 
-            {/* Footer */}
+            {/* footer */}
             <motion.footer id="contact" className="careerplus__footer"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}

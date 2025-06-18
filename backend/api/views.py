@@ -1,6 +1,8 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.hashers import make_password, check_password
 from .models import Admin, Employer, JobSeeker, Job, JobApplicant, Company
 from .serializers import (
@@ -80,8 +82,10 @@ class JobSeekerViewSet(viewsets.ModelViewSet):
             instance.save()
 
 class JobViewSet(viewsets.ModelViewSet):
-    queryset = Job.objects.all()
+    queryset = Job.objects.all().order_by('-posted_date')
     serializer_class = JobSerializer
+    filter_backends = [filters.SearchFilter]  # Start with just search
+    search_fields = ['job_title', 'description']  # Basic search fields
 
 class JobApplicantViewSet(viewsets.ModelViewSet):
     queryset = JobApplicant.objects.all()

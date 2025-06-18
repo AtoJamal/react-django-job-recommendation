@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'django-backend-k2dm.onrender.com/api',
+  baseURL: 'http://127.0.0.1:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -41,12 +41,16 @@ export default {
   loginJobSeeker: (data) => api.post('/login/jobseeker/', data),
   loginEmployer: (data) => api.post('/login/employer/', data),
   
-  // Existing endpoints
+  // Profile endpoints
   getAdmins: () => api.get('/admins/'),
   getEmployers: () => api.get('/employers/'),
   getJobSeekers: () => api.get('/jobseekers/'),
-  getJobs: () => api.get('/jobs/'),
+  
   getApplications: () => api.get('/applications/'),
   
-  // Add more endpoints as needed
+  getJobs: (searchTerm) => api.get('/jobs/', {
+    params: {
+      search: searchTerm || '' 
+    }
+  }),
 };

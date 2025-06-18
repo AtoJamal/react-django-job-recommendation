@@ -93,7 +93,7 @@
     top: 0;
     left: 0;
     right: 0;
-    padding: 1.5rem 0;
+    padding: 0;
     z-index: 1000;
     transition: all 0.3s ease;
     background: var(--header-bg);
@@ -130,10 +130,11 @@
 .careerplus__nav-link {
     margin: 0 1rem;
     text-decoration: none;
-    color: var(--nav-text);
+    color: var(--accent-secondary);
     font-weight: 500;
     transition: all 0.3s ease;
     position: relative;
+    
 }
 
 .careerplus__nav-link:hover {

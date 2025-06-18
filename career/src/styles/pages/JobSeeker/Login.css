@@ -249,6 +249,7 @@
     border: 1px solid #ef4444;
 }
 
+
 @keyframes shake {
     0% { transform: translateX(0); }
     25% { transform: translateX(-4px); }

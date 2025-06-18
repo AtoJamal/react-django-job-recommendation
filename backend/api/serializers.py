@@ -31,7 +31,7 @@ class JobSeekerSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password must be at least 8 characters long.")
         return value
 
-# Keep your existing serializers for other models
+
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Admin
