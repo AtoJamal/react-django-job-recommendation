@@ -86,22 +86,6 @@ DATABASES = {
     }
 }
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication', # Use token auth
-        'rest_framework.authentication.SessionAuthentication', # Optional, for browsable API
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly', # Allow read-only for unauthenticated users
-    ],
-    'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser', # Ensure JSON is parsed correctly
-    ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer', # Ensure JSON is rendered correctly
-        'rest_framework.renderers.BrowsableAPIRenderer', # Optional, for browsable API
-    ],
-}
 
 
 # Password validation
