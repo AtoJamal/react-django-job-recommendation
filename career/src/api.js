@@ -47,6 +47,11 @@ export default {
   getJobSeekers: () => api.get('/jobseekers/'),
   
   getApplications: () => api.get('/applications/'),
+
+  postJob: (data) => api.post('/jobs/', data),
+  
+  // if we need to update jobs later
+  updateJob: (id, data) => api.patch(`/jobs/${id}/`, data),
   
   getJobs: (searchTerm) => api.get('/jobs/', {
     params: {

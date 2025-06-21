@@ -1,45 +1,94 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import '../../styles/pages/JobSeeker/Register.css';
-import api from '../../api';
+import { Link, useNavigate } from 'react-router-dom'; // Corrected syntax here
+import '../../styles/pages/JobSeeker/Register.css'; // Assuming this path is correct in your project
+import api from '../../api'; // Assuming this path is correct in your project
 import { motion } from 'framer-motion';
-import { FiSun, FiMoon } from 'react-icons/fi';
-import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
+import { FiSun, FiMoon } from 'react-icons/fi'; // Re-added react-icons
+import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa'; // Re-added react-icons
 
 const Register = () => {
+    /*
+     * `useNavigate` is a hook from `react-router-dom` used for programmatic navigation.
+     * It allows changing the URL and pushing/replacing entries in the history stack.
+     */
     const navigate = useNavigate();
-    // Theme logic
+
+    /*
+     * `scrolled` state: Controls whether the header has been scrolled past a certain point.
+     * Used for applying different styles (e.g., box-shadow) when scrolling.
+     */
     const [scrolled, setScrolled] = useState(false);
+
+    /*
+     * `theme` state: Manages the current theme ('light' or 'dark').
+     * It initializes from localStorage or defaults based on user's system preference.
+     */
     const [theme, setTheme] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
+        // If no theme is saved, check system preference
         if (!savedTheme) {
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
         return savedTheme;
     });
+
+    /*
+     * Effect to apply the theme to the document's `data-theme` attribute and save to localStorage.
+     * This allows CSS variables to react to theme changes.
+     */
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
-    }, [theme]);
+    }, [theme]); // Reruns whenever `theme` changes
+
+    /*
+     * Effect to handle scroll events for the header.
+     * Adds or removes the 'scrolled' class based on scroll position.
+     */
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 50) {
+            if (window.scrollY > 50) { // If scrolled more than 50px
                 setScrolled(true);
             } else {
                 setScrolled(false);
             }
         };
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll); // Attach listener
+        // Cleanup function: remove listener when component unmounts
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, []); // Runs once on mount
+
+    /*
+     * Function to toggle the theme between 'light' and 'dark'.
+     */
     const toggleTheme = () => {
         setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
     };
 
+    /*
+     * `userType` state: Determines if the user is registering as a 'jobSeeker' or 'employer'.
+     */
     const [userType, setUserType] = useState('jobSeeker');
+
+    /*
+     * `hasCompany` state: For employers, determines if they are registering with company details.
+     */
     const [hasCompany, setHasCompany] = useState(false);
+
+    /*
+     * `error` state: Stores and displays any error messages from form submission or API calls.
+     */
     const [error, setError] = useState('');
+
+    /*
+     * `loading` state: Indicates if the form submission is in progress.
+     */
     const [loading, setLoading] = useState(false);
+
+    /*
+     * `formData` state: Holds all the input values for the registration form.
+     * Includes fields for both job seekers and employers.
+     */
     const [formData, setFormData] = useState({
         firstName: '',
         middleName: '',
@@ -47,22 +96,25 @@ const Register = () => {
         age: '',
         gender: '',
         location: '',
-        countryCode: '+1',
+        countryCode: '+1', // Default country code for phone number
         phone: '',
         email: '',
+        username: '',   // Re-added: Username for Django User model
         password: '',
-        // Job Seeker specific
+        password2: '',  // Re-added: Password confirmation for Django User model
+        // Job Seeker specific fields
         degree: '',
         experience: '',
         graduationYear: '',
         fieldOfStudy: '',
-        // Employer with company
+        // Employer specific fields (for company details if 'hasCompany' is true)
         companyName: '',
         companyLocation: '',
         employeesCount: '',
         establishmentYear: ''
     });
 
+    // --- Data for dropdown/select inputs ---
     const GENDER_CHOICES = [
         { value: 'Male', label: 'Male' },
         { value: 'Female', label: 'Female' },
@@ -103,109 +155,133 @@ const Register = () => {
         { code: '+212', country: 'Morocco' }
     ];
 
+    /*
+     * `handleChange` function: A generic handler for all text and select inputs.
+     * Updates `formData` state based on the input's `name` attribute.
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    /*
+     * `handlePhoneChange` function: Specific handler for the phone number input.
+     * Ensures only digits are entered.
+     */
     const handlePhoneChange = (e) => {
         const value = e.target.value;
-        // Only allow numbers
-        if (/^\d*$/.test(value)) {
+        if (/^\d*$/.test(value)) { // Regular expression to allow only digits
             setFormData(prev => ({ ...prev, phone: value }));
         }
     };
 
+    /*
+     * `handleSubmit` function: Handles the form submission.
+     * Sends data to the appropriate API endpoint based on `userType`.
+     * Includes error handling for network issues and API responses.
+     */
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+        e.preventDefault(); // Prevent default browser form submission
+        setError(''); // Clear any previous error messages
+        setLoading(true); // Show loading indicator
 
         try {
-            // Prepare the data based on user type
+            // Prepare the common submission data fields, including username and password2
             const submitData = {
                 first_name: formData.firstName,
-                middle_name: formData.middleName || null, // Send null if empty string
+                middle_name: formData.middleName || null, // Send null for empty middle name
                 last_name: formData.lastName,
-                age: parseInt(formData.age) || null,
+                age: parseInt(formData.age) || null, // Convert age to integer, or null if invalid
                 gender: formData.gender,
                 location: formData.location,
-                phone_number: formData.countryCode + formData.phone,
+                phone_number: formData.countryCode + formData.phone, // Concatenate country code and phone number
                 email: formData.email,
+                username: formData.username, // Include username
                 password: formData.password,
-                is_email_verified: false
+                password2: formData.password2, // Include password confirmation
+                is_email_verified: false // Default email verification status
             };
 
+            // Conditionally add fields based on user type
             if (userType === 'jobSeeker') {
-                
                 submitData.degree = formData.degree;
-                submitData.experience = parseInt(formData.experience) || 0;
+                submitData.experience = parseInt(formData.experience) || 0; // Convert experience to integer, default to 0
                 submitData.graduation_year = parseInt(formData.graduationYear);
                 submitData.field_of_study = formData.fieldOfStudy;
 
-                const response = await api.createJobSeeker(submitData);
+                // Call the job seeker registration API endpoint
+                const response = await api.createJobSeeker(submitData); // Using external 'api'
                 if (response.data) {
+                    // Navigate to the login page upon successful registration
                     navigate('/login', { state: { success: 'Registration successful! Please login.' } });
                 }
-            } else {
-                
+            } else { // User is an 'employer'
                 if (hasCompany) {
+                    // If employer has a company, include company details
                     submitData.company = {
                         name: formData.companyName,
                         location: formData.companyLocation,
                         number_of_employees: parseInt(formData.employeesCount) || null,
                         year_established: parseInt(formData.establishmentYear) || null
                     };
+                } else {
+                    // If no company, explicitly set company to null
+                    submitData.company = null;
                 }
 
-                const response = await api.createEmployer(submitData);
+                // Call the employer registration API endpoint
+                const response = await api.createEmployer(submitData); // Using external 'api'
                 if (response.data) {
+                    // Navigate to the login page upon successful registration
                     navigate('/login', { state: { success: 'Registration successful! Please login.' } });
                 }
             }
-        } 
+        }
         catch (err) {
-            console.error('Full error object:', err);
-            
-            // Network errors (no response from server)
+            console.error('Full error object:', err); // Log the complete error for debugging
+
+            // Handle network errors (e.g., server unreachable)
             if (err.message === "Network Error") {
-                setError('Cannot connect to server.');
+                setError('Cannot connect to server. Please check your internet connection or server status.');
                 return;
             }
-        
-            // Backend returned error response (4xx/5xx)
+
+            // Handle API response errors (e.g., HTTP 4xx, 5xx status codes)
             if (err.response) {
                 const errorData = err.response.data;
-                
-                // Django validation errors (400 Bad Request)
                 if (err.response.status === 400) {
+                    // Handle specific validation errors from the backend (e.g., "email: ['This field is required']")
                     if (typeof errorData === 'object') {
-                        // Handle field errors like {"email": ["This field is required"]}
-                        const firstError = Object.entries(errorData)[0];
-                        setError(`${firstError[0]}: ${firstError[1][0]}`);
+                        const errorMessages = [];
+                        for (const key in errorData) {
+                            if (Array.isArray(errorData[key])) {
+                                errorMessages.push(`${key}: ${errorData[key].join(', ')}`);
+                            } else if (typeof errorData[key] === 'string') {
+                                errorMessages.push(errorData[key]);
+                            }
+                        }
+                        setError(errorMessages.join('\n') || 'Invalid data submitted.');
                     } else {
-                        setError(errorData.detail || 'Invalid data submitted');
+                        setError(errorData.detail || 'Invalid data submitted.');
                     }
+                } else {
+                    setError(errorData.detail || `Server error (${err.response.status}).`);
                 }
-                // Other HTTP errors
-                else {
-                    setError(errorData.detail || `Server error (${err.response.status})`);
-                }
-                return;
+            } else {
+                // Catch-all for unknown errors
+                setError('Unknown error occurred. Check console for details.');
             }
-        
-            // All other cases
-            setError('Unknown error occurred. Check console for details');
         } finally {
-            setLoading(false);
+            setLoading(false); // Hide loading indicator regardless of success or failure
         }
     };
 
     return (
         <div className={`careerplus-register-root ${theme}`}>
-            {/* Header */}
+            {/* Header Section */}
             <motion.header
                 className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
+                // Dynamically adjust header background color based on theme and scroll position
                 initial={{ backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)' }}
                 animate={{
                     backgroundColor: scrolled
@@ -224,19 +300,19 @@ const Register = () => {
                         CareerPlus
                     </motion.h1>
                     <nav className="careerplus__nav">
-                        <a href="/" className="careerplus__nav-link">Home</a>
-                    <button
+                        <Link to="/" className="careerplus__nav-link">Home</Link> {/* Using Link for navigation */}
+                        <button
                             className="careerplus__theme-toggle"
                             onClick={toggleTheme}
                             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
                         >
-                            {theme === 'light' ? <FiMoon /> : <FiSun />}
-                    </button>
+                            {theme === 'light' ? <FiMoon /> : <FiSun />} {/* Using react-icons */}
+                        </button>
                     </nav>
                 </div>
             </motion.header>
 
-            {/* Main Register Section */}
+            {/* Main Registration Section */}
             <main className="careerplus-register-main">
                 <motion.section
                     className="careerplus-register-card glass-card"
@@ -247,8 +323,10 @@ const Register = () => {
                     <h1 className="careerplus-register-title">Create Account</h1>
                     <p className="careerplus-register-subtitle">Join us as a...</p>
 
+                    {/* Display error message if `error` state is not empty */}
                     {error && <div className="careerplus-register-error">{error}</div>}
 
+                    {/* User Type Selection: Job Seeker or Employer */}
                     <div className="user-type-group">
                         <div className="user-type-options">
                             <label className={`user-type-option ${userType === 'jobSeeker' ? 'selected' : ''}`}>
@@ -272,23 +350,25 @@ const Register = () => {
                                 Employer
                             </label>
                         </div>
-                </div>
+                    </div>
 
+                    {/* Registration Form */}
                     <form onSubmit={handleSubmit} className="careerplus-register-form">
-                    <div className="form-row">
-                        <div className="form-group">
+                        {/* First Name and Middle Name Row */}
+                        <div className="form-row">
+                            <div className="form-group">
                                 <label htmlFor="firstName" className="careerplus-register-label">First Name</label>
-                            <input
-                                type="text"
-                                id="firstName"
-                                name="firstName"
-                                value={formData.firstName}
-                                onChange={handleChange}
-                                required
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
+                                    required
                                     className="careerplus-register-input"
-                                placeholder="First name"
-                            />
-                        </div>
+                                    placeholder="First name"
+                                />
+                            </div>
 
                             <div className="form-group">
                                 <label htmlFor="middleName" className="careerplus-register-label">Middle Name</label>
@@ -302,8 +382,9 @@ const Register = () => {
                                     placeholder="Middle name (optional)"
                                 />
                             </div>
-                    </div>
+                        </div>
 
+                        {/* Last Name */}
                         <div className="form-group">
                             <label htmlFor="lastName" className="careerplus-register-label">Last Name</label>
                             <input
@@ -318,57 +399,60 @@ const Register = () => {
                             />
                         </div>
 
-                    <div className="form-row">
-                        <div className="form-group">
+                        {/* Age and Gender Row */}
+                        <div className="form-row">
+                            <div className="form-group">
                                 <label htmlFor="age" className="careerplus-register-label">Age</label>
+                                <input
+                                    type="number"
+                                    id="age"
+                                    name="age"
+                                    value={formData.age}
+                                    onChange={handleChange}
+                                    required
+                                    min="18"
+                                    className="careerplus-register-input"
+                                    placeholder="Your age"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="gender" className="careerplus-register-label">Gender</label>
+                                <select
+                                    id="gender"
+                                    name="gender"
+                                    value={formData.gender}
+                                    onChange={handleChange}
+                                    required
+                                    className="careerplus-register-input"
+                                >
+                                    <option value="">Select gender</option>
+                                    {GENDER_CHOICES.map(choice => (
+                                        <option key={choice.value} value={choice.value}>
+                                            {choice.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Location */}
+                        <div className="form-group">
+                            <label htmlFor="location" className="careerplus-register-label">Location</label>
                             <input
-                                type="number"
-                                id="age"
-                                name="age"
-                                value={formData.age}
+                                type="text"
+                                id="location"
+                                name="location"
+                                value={formData.location}
                                 onChange={handleChange}
                                 required
-                                min="18"
-                                    className="careerplus-register-input"
-                                placeholder="Your age"
+                                className="careerplus-register-input"
+                                placeholder="City, Country"
                             />
                         </div>
 
+                        {/* Phone Number with Country Code */}
                         <div className="form-group">
-                                <label htmlFor="gender" className="careerplus-register-label">Gender</label>
-                            <select
-                                id="gender"
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleChange}
-                                required
-                                    className="careerplus-register-input"
-                            >
-                                <option value="">Select gender</option>
-                                {GENDER_CHOICES.map(choice => (
-                                    <option key={choice.value} value={choice.value}>
-                                        {choice.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                            <label htmlFor="location" className="careerplus-register-label">Location</label>
-                        <input
-                            type="text"
-                            id="location"
-                            name="location"
-                            value={formData.location}
-                            onChange={handleChange}
-                            required
-                                className="careerplus-register-input"
-                            placeholder="City, Country"
-                        />
-                    </div>
-
-                    <div className="form-group">
                             <label htmlFor="phone" className="careerplus-register-label">Phone Number</label>
                             <div className="phone-input-group">
                                 <select
@@ -384,216 +468,253 @@ const Register = () => {
                                         </option>
                                     ))}
                                 </select>
-                        <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    value={formData.phone}
                                     onChange={handlePhoneChange}
-                            required
+                                    required
                                     className="careerplus-register-input phone-input"
                                     placeholder="Phone number"
-                                    pattern="[0-9]*"
-                                    inputMode="numeric"
-                        />
-                            </div>
-                    </div>
-
-                    {userType === 'jobSeeker' && (
-                        <>
-                            <div className="form-group">
-                                    <label htmlFor="degree" className="careerplus-register-label">Highest Degree</label>
-                                <select
-                                    id="degree"
-                                    name="degree"
-                                    value={formData.degree}
-                                    onChange={handleChange}
-                                    required
-                                        className="careerplus-register-input"
-                                >
-                                    <option value="">Select degree</option>
-                                    {DEGREE_CHOICES.map(choice => (
-                                        <option key={choice.value} value={choice.value}>
-                                            {choice.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                        <label htmlFor="experience" className="careerplus-register-label">Experience (years)</label>
-                                    <input
-                                        type="number"
-                                        id="experience"
-                                        name="experience"
-                                        value={formData.experience}
-                                        onChange={handleChange}
-                                        min="0"
-                                            className="careerplus-register-input"
-                                        placeholder="Years of experience"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                        <label htmlFor="graduationYear" className="careerplus-register-label">Graduation Year</label>
-                                    <input
-                                        type="number"
-                                        id="graduationYear"
-                                        name="graduationYear"
-                                        value={formData.graduationYear}
-                                        onChange={handleChange}
-                                        min="1900"
-                                        max={new Date().getFullYear()}
-                                            className="careerplus-register-input"
-                                        placeholder="Year of graduation"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                    <label htmlFor="fieldOfStudy" className="careerplus-register-label">Field of Study</label>
-                                <select
-                                    id="fieldOfStudy"
-                                    name="fieldOfStudy"
-                                    value={formData.fieldOfStudy}
-                                    onChange={handleChange}
-                                    required
-                                        className="careerplus-register-input"
-                                >
-                                    <option value="">Select field of study</option>
-                                    {FIELD_OF_STUDY_CHOICES.map(choice => (
-                                        <option key={choice.value} value={choice.value}>
-                                            {choice.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </>
-                    )}
-
-                    {userType === 'employer' && (
-                        <div className="form-group">
-                            <label className="checkbox-label">
-                                <input
-                                    type="checkbox"
-                                    checked={hasCompany}
-                                    onChange={() => setHasCompany(!hasCompany)}
+                                    pattern="[0-9]*" // HTML5 pattern for numeric input
+                                    inputMode="numeric" // Soft keyboard hint for mobile
                                 />
-                                <span>Do you own a company?</span>
-                            </label>
+                            </div>
                         </div>
-                    )}
 
-                    {userType === 'employer' && hasCompany && (
-                        <>
-                            <div className="form-group">
-                                    <label htmlFor="companyName" className="careerplus-register-label">Company Name</label>
-                                <input
-                                    type="text"
-                                    id="companyName"
-                                    name="companyName"
-                                    value={formData.companyName}
-                                    onChange={handleChange}
-                                    required
-                                        className="careerplus-register-input"
-                                    placeholder="Your company name"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                    <label htmlFor="companyLocation" className="careerplus-register-label">Company Location</label>
-                                <input
-                                    type="text"
-                                    id="companyLocation"
-                                    name="companyLocation"
-                                    value={formData.companyLocation}
-                                    onChange={handleChange}
-                                    required
-                                        className="careerplus-register-input"
-                                    placeholder="Company headquarters"
-                                />
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                        <label htmlFor="employeesCount" className="careerplus-register-label">Number of Employees</label>
-                                    <input
-                                        type="number"
-                                        id="employeesCount"
-                                        name="employeesCount"
-                                        value={formData.employeesCount}
-                                        onChange={handleChange}
-                                        min="1"
-                                            className="careerplus-register-input"
-                                        placeholder="Approximate count"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                        <label htmlFor="establishmentYear" className="careerplus-register-label">Year Established</label>
-                                    <input
-                                        type="number"
-                                        id="establishmentYear"
-                                        name="establishmentYear"
-                                        value={formData.establishmentYear}
-                                        onChange={handleChange}
-                                        min="1900"
-                                        max={new Date().getFullYear()}
-                                            className="careerplus-register-input"
-                                        placeholder="Year founded"
-                                    />
-                                </div>
-                            </div>
-                        </>
-                    )}
-
-                    <div className="form-group">
+                        {/* Email Address */}
+                        <div className="form-group">
                             <label htmlFor="email" className="careerplus-register-label">Email Address</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
                                 className="careerplus-register-input"
-                            placeholder="Enter your email"
-                        />
-                    </div>
+                                placeholder="Enter your email"
+                            />
+                        </div>
 
-                    <div className="form-group">
+                        {/* Username Input Field */}
+                        <div className="form-group">
+                            <label htmlFor="username" className="careerplus-register-label">Username</label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                required
+                                className="careerplus-register-input"
+                                placeholder="Choose a username"
+                            />
+                        </div>
+
+                        {/* Password */}
+                        <div className="form-group">
                             <label htmlFor="password" className="careerplus-register-label">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            minLength="8"
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                minLength="8"
                                 className="careerplus-register-input"
-                            placeholder="Create a password"
-                        />
-                        <p className="password-hint">Minimum 8 characters</p>
-                    </div>
+                                placeholder="Create a password"
+                            />
+                            <p className="password-hint">Minimum 8 characters</p>
+                        </div>
 
-                    <button 
-                        type="submit" 
+                        {/* Password2 (Confirm Password) Input Field */}
+                        <div className="form-group">
+                            <label htmlFor="password2" className="careerplus-register-label">Confirm Password</label>
+                            <input
+                                type="password"
+                                id="password2"
+                                name="password2"
+                                value={formData.password2}
+                                onChange={handleChange}
+                                required
+                                minLength="8"
+                                className="careerplus-register-input"
+                                placeholder="Confirm your password"
+                            />
+                        </div>
+
+                        {/* Job Seeker Specific Fields (conditionally rendered) */}
+                        {userType === 'jobSeeker' && (
+                            <>
+                                <div className="form-group">
+                                    <label htmlFor="degree" className="careerplus-register-label">Highest Degree</label>
+                                    <select
+                                        id="degree"
+                                        name="degree"
+                                        value={formData.degree}
+                                        onChange={handleChange}
+                                        required
+                                        className="careerplus-register-input"
+                                    >
+                                        <option value="">Select degree</option>
+                                        {DEGREE_CHOICES.map(choice => (
+                                            <option key={choice.value} value={choice.value}>
+                                                {choice.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label htmlFor="experience" className="careerplus-register-label">Experience (years)</label>
+                                        <input
+                                            type="number"
+                                            id="experience"
+                                            name="experience"
+                                            value={formData.experience}
+                                            onChange={handleChange}
+                                            min="0"
+                                            className="careerplus-register-input"
+                                            placeholder="Years of experience"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="graduationYear" className="careerplus-register-label">Graduation Year</label>
+                                        <input
+                                            type="number"
+                                            id="graduationYear"
+                                            name="graduationYear"
+                                            value={formData.graduationYear}
+                                            onChange={handleChange}
+                                            min="1900"
+                                            max={new Date().getFullYear()}
+                                            className="careerplus-register-input"
+                                            placeholder="Year of graduation"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="fieldOfStudy" className="careerplus-register-label">Field of Study</label>
+                                    <select
+                                        id="fieldOfStudy"
+                                        name="fieldOfStudy"
+                                        value={formData.fieldOfStudy}
+                                        onChange={handleChange}
+                                        required
+                                        className="careerplus-register-input"
+                                    >
+                                        <option value="">Select field of study</option>
+                                        {FIELD_OF_STUDY_CHOICES.map(choice => (
+                                            <option key={choice.value} value={choice.value}>
+                                                {choice.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Employer Specific Fields (conditionally rendered) */}
+                        {userType === 'employer' && (
+                            <div className="form-group">
+                                <label className="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        checked={hasCompany}
+                                        onChange={() => setHasCompany(!hasCompany)}
+                                    />
+                                    <span>Do you own a company?</span>
+                                </label>
+                            </div>
+                        )}
+
+                        {userType === 'employer' && hasCompany && (
+                            <>
+                                <div className="form-group">
+                                    <label htmlFor="companyName" className="careerplus-register-label">Company Name</label>
+                                    <input
+                                        type="text"
+                                        id="companyName"
+                                        name="companyName"
+                                        value={formData.companyName}
+                                        onChange={handleChange}
+                                        required
+                                        className="careerplus-register-input"
+                                        placeholder="Your company name"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="companyLocation" className="careerplus-register-label">Company Location</label>
+                                    <input
+                                        type="text"
+                                        id="companyLocation"
+                                        name="companyLocation"
+                                        value={formData.companyLocation}
+                                        onChange={handleChange}
+                                        required
+                                        className="careerplus-register-input"
+                                        placeholder="Company headquarters"
+                                    />
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label htmlFor="employeesCount" className="careerplus-register-label">Number of Employees</label>
+                                        <input
+                                            type="number"
+                                            id="employeesCount"
+                                            name="employeesCount"
+                                            value={formData.employeesCount}
+                                            onChange={handleChange}
+                                            min="1"
+                                            className="careerplus-register-input"
+                                            placeholder="Approximate count"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="establishmentYear" className="careerplus-register-label">Year Established</label>
+                                        <input
+                                            type="number"
+                                            id="establishmentYear"
+                                            name="establishmentYear"
+                                            value={formData.establishmentYear}
+                                            onChange={handleChange}
+                                            min="1900"
+                                            max={new Date().getFullYear()}
+                                            className="careerplus-register-input"
+                                            placeholder="Year founded"
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
                             className="careerplus-register-btn"
-                        disabled={loading}
-                    >
-                        {loading ? 'Creating Account...' : 'Create Account'}
-                    </button>
-                </form>
+                            disabled={loading} // Disable button when loading
+                        >
+                            {loading ? 'Creating Account...' : 'Create Account'}
+                        </button>
+                    </form>
 
+                    {/* Registration Footer with Login Link */}
                     <div className="careerplus-register-footer">
                         <p>Already have an account? <Link to="/login" className="careerplus-register-link">Login</Link></p>
                     </div>
                 </motion.section>
             </main>
 
-            {/* Footer */}
+            {/* Footer Section */}
             <footer id="contact" className="careerplus__footer">
                 <div className="careerplus__footer-container">
                     <div className="careerplus__footer-brand">
@@ -604,9 +725,9 @@ const Register = () => {
                     </div>
                     <div className="careerplus__footer-links">
                         <h4 className="careerplus__footer-heading">Quick Links</h4>
-                        <a href="/" className="careerplus__footer-link">Home</a>
-                        <a href="/login" className="careerplus__footer-link">Login</a>
-                        <a href="/register" className="careerplus__footer-link">Register</a>
+                        <Link to="/" className="careerplus__footer-link">Home</Link>
+                        <Link to="/login" className="careerplus__footer-link">Login</Link>
+                        <Link to="/register" className="careerplus__footer-link">Register</Link>
                     </div>
                     <div className="careerplus__footer-contact">
                         <h4 className="careerplus__footer-heading">Contact Us</h4>
@@ -624,7 +745,7 @@ const Register = () => {
                 </div>
                 <div className="careerplus__footer-bottom">
                     <p>&copy; {new Date().getFullYear()} CareerPlus. All rights reserved.</p>
-            </div>
+                </div>
             </footer>
         </div>
     );

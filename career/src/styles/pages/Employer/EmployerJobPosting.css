@@ -1,3 +1,5 @@
+
+
 /* Base Styles */
 * {
     box-sizing: border-box;
@@ -93,6 +95,40 @@
     background-color: #2980b9;
 }
 
+
+.error-message {
+    color: #d32f2f;
+    background-color: #fde8e8;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid #d32f2f;
+}
+
+.success-message {
+    color: #2e7d32;
+    background-color: #edf7ed;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid #2e7d32;
+}
+
+.submit-btn:disabled {
+    background-color: #b0bec5;
+    cursor: not-allowed;
+}
+
+/* Make required field indicators clearer */
+label[required]::after,
+label:has(+ input[required])::after,
+label:has(+ select[required])::after,
+label:has(+ textarea[required])::after {
+    content: " *";
+    color: #d32f2f;
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .job-posting-container {
@@ -114,3 +150,5 @@
         padding: 15px;
     }
 }
+
+

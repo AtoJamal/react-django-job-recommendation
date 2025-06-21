@@ -1,108 +1,25 @@
-
+import { useState } from 'react';
+import api from '../../api';
 import '../../styles/pages/Employer/EmployerJobPosting.css';
-
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiEdit, FiSave, FiUser, FiMail, FiPhone, FiLock, FiBriefcase, FiPlus, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
-import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
 
 const EmployerJobPosting = () => {
     const [formData, setFormData] = useState({
         jobTitle: '',
-        requiredAge: '',
+        location: '', 
+        requiredAge: '', 
         salary: '',
         category: 'IT',
-        experience: '',
+        experience: '', 
         quota: '',
         deadline: '',
         description: ''
     });
 
-    const categories = ['IT', 'Marketing', 'Finance', 'HR', 'Design', 'Engineering'];
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(false);
 
-    const navigate = useNavigate();
-        const [scrolled, setScrolled] = useState(false);
-        const [theme, setTheme] = useState(() => {
-            const savedTheme = localStorage.getItem('theme');
-            if (!savedTheme) {
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-            return savedTheme;
-        });
-    
-        useEffect(() => {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-        }, [theme]);
-    
-        useEffect(() => {
-            const handleScroll = () => {
-                if (window.scrollY > 50) {
-                    setScrolled(true);
-                } else {
-                    setScrolled(false);
-                }
-            };
-            window.addEventListener('scroll', handleScroll);
-            return () => window.removeEventListener('scroll', handleScroll);
-        }, []);
-    
-        const toggleTheme = () => {
-            setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-        };
-    
-        const handleLogout = () => {
-            localStorage.removeItem('user');
-            navigate('/');
-        };
-    
-
-    {/* Header */}
-                <motion.header
-                    className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
-                    initial={{ backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)' }}
-                    animate={{
-                        backgroundColor: scrolled
-                            ? (theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)')
-                            : (theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)')
-                    }}
-                    transition={{ duration: 0.3 }}
-                >
-                    <div className="careerplus__header-container">
-                        <motion.h1
-                            className="careerplus__logo"
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            CareerPlus
-                        </motion.h1>
-                        <nav className="careerplus__nav">
-                            <button 
-                                className="careerplus__nav-icon" 
-                                title="Post Job" 
-                                onClick={() => navigate('/employerjobposting')}
-                            >
-                                <FiPlus />
-                            </button>
-                            <button 
-                                className="careerplus__nav-icon" 
-                                title="Logout" 
-                                onClick={handleLogout}
-                            >
-                                <FiLogOut />
-                            </button>
-                            <button
-                                className="careerplus__theme-toggle"
-                                onClick={toggleTheme}
-                                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-                            >
-                                {theme === 'light' ? <FiMoon /> : <FiSun />}
-                            </button>
-                        </nav>
-                    </div>
-                </motion.header>
+    const categories = ['IT', 'Marketing', 'Finance', 'HR', 'Design', 'Engineering', 'Healthcare', 'Education', 'Other'];
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -112,18 +29,82 @@ const EmployerJobPosting = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Job Posted:', formData);
-        alert('Job posted successfully!');
+        setIsSubmitting(true);
+        setError(null);
+        setSuccess(false);
+
+        // Prepare data for API
+        const jobData = {
+            job_title: formData.jobTitle,
+            location: formData.location,
+            required_year: formData.experience || null,
+            salary: formData.salary === 'Negotiable' || formData.salary === '' ? null : parseFloat(formData.salary),
+            category: formData.category,
+            quota: parseInt(formData.quota),
+            deadline: formData.deadline,
+            description: formData.description,
+            // These will be set automatically by the backend:
+            // employer: (set from auth token)
+            // status: 'Pending' (or whatever default the backend uses)
+        };
+
+        // Validate required fields
+        if (!jobData.job_title || !jobData.location || !jobData.quota || !jobData.deadline || !jobData.description) {
+            setError('Please fill in all required fields: Job Title, Location, Quota, Deadline, and Description.');
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            const response = await api.postJob(jobData);
+            console.log('Job posted successfully:', response.data);
+            
+            setSuccess(true);
+            // Reset form
+            setFormData({
+                jobTitle: '',
+                location: '',
+                requiredAge: '',
+                salary: '',
+                category: 'IT',
+                experience: '',
+                quota: '',
+                deadline: '',
+                description: ''
+            });
+            
+        } catch (error) {
+            console.error('Error posting job:', error);
+            setError(error.response?.data?.detail || 
+                    error.response?.data || 
+                    error.message || 
+                    'Failed to post job. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
         <div className="job-posting-container">
             <h1>Post a New Job</h1>
+            
+            {error && (
+                <div className="error-message">
+                    {typeof error === 'object' ? JSON.stringify(error) : error}
+                </div>
+            )}
+            
+            {success && (
+                <div className="success-message">
+                    Job posted successfully! It will be visible after admin approval.
+                </div>
+            )}
+
             <form onSubmit={handleSubmit} className="job-posting-form">
                 <div className="form-group">
-                    <label htmlFor="jobTitle">Job Title</label>
+                    <label htmlFor="jobTitle">Job Title *</label>
                     <input
                         type="text"
                         id="jobTitle"
@@ -134,9 +115,21 @@ const EmployerJobPosting = () => {
                     />
                 </div>
 
+                <div className="form-group">
+                    <label htmlFor="location">Location *</label>
+                    <input
+                        type="text"
+                        id="location"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="requiredAge">Required Age</label>
+                        <label htmlFor="requiredAge">Minimum Age</label>
                         <input
                             type="number"
                             id="requiredAge"
@@ -148,7 +141,7 @@ const EmployerJobPosting = () => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="salary">Salary ($)</label>
+                        <label htmlFor="salary">Salary</label>
                         <input
                             type="text"
                             id="salary"
@@ -176,13 +169,12 @@ const EmployerJobPosting = () => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="graduationYear">Required Experience Year</label>
+                        <label htmlFor="experience">Years of Experience</label>
                         <input
                             type="number"
                             id="experience"
                             name="experience"
                             min="0"
-                            max="15"
                             value={formData.experience}
                             onChange={handleChange}
                         />
@@ -191,7 +183,7 @@ const EmployerJobPosting = () => {
 
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="quota">Quota (Open Positions)</label>
+                        <label htmlFor="quota">Open Positions *</label>
                         <input
                             type="number"
                             id="quota"
@@ -204,20 +196,21 @@ const EmployerJobPosting = () => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="deadline">Application Deadline</label>
+                        <label htmlFor="deadline">Application Deadline *</label>
                         <input
                             type="date"
                             id="deadline"
                             name="deadline"
                             value={formData.deadline}
                             onChange={handleChange}
+                            min={new Date().toISOString().split('T')[0]}
                             required
                         />
                     </div>
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="description">Job Description</label>
+                    <label htmlFor="description">Job Description *</label>
                     <textarea
                         id="description"
                         name="description"
@@ -228,48 +221,14 @@ const EmployerJobPosting = () => {
                     ></textarea>
                 </div>
 
-                <button type="submit" className="submit-btn">Post Job</button>
+                <button 
+                    type="submit" 
+                    className="submit-btn"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? 'Posting...' : 'Post Job'}
+                </button>
             </form>
-
-             {/* Footer */}
-            <motion.footer 
-                className="careerplus__footer"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-            >
-                <div className="careerplus__footer-container">
-                    <div className="careerplus__footer-brand">
-                        <h3 className="careerplus__logo">CareerPlus</h3>
-                        <p className="careerplus__footer-text">
-                            AI-powered job matching for the modern professional.
-                        </p>
-                    </div>
-                    <div className="careerplus__footer-links">
-                        <h4 className="careerplus__footer-heading">Quick Links</h4>
-                        <a href="/" className="careerplus__footer-link">Home</a>
-                        <a href="/employeraccount" className="careerplus__footer-link">Account</a>
-                        <a href="/employerjobposting" className="careerplus__footer-link">Post Job</a>
-                    </div>
-                    <div className="careerplus__footer-contact">
-                        <h4 className="careerplus__footer-heading">Contact Us</h4>
-                        <p className="careerplus__footer-text">hello@careerplus.com</p>
-                        <p className="careerplus__footer-text">+251 (9) 123-456</p>
-                    </div>
-                    <div className="careerplus__footer-social">
-                        <h4 className="careerplus__footer-heading">Follow Us</h4>
-                        <div className="careerplus__social-icons">
-                            <a href="#" className="careerplus__social-icon"><FaLinkedin /></a>
-                            <a href="#" className="careerplus__social-icon"><FaTwitter /></a>
-                            <a href="#" className="careerplus__social-icon"><FaGithub /></a>
-                        </div>
-                    </div>
-                </div>
-                <div className="careerplus__footer-bottom">
-                    <p>&copy; {new Date().getFullYear()} CareerPlus. All rights reserved.</p>
-                </div>
-            </motion.footer>
-            
         </div>
     );
 };
