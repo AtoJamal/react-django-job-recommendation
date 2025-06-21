@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import User
 
 class Admin(models.Model):
     ROLE_CHOICES = [
@@ -24,6 +25,7 @@ class Admin(models.Model):
         verbose_name = 'Admin'
         verbose_name_plural = 'Admins'
         db_table = 'admin'
+        managed = True
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
@@ -43,12 +45,20 @@ class Company(models.Model):
         verbose_name = 'Company'
         verbose_name_plural = 'Companies'
         db_table = 'company'
+        managed = True
 
     def __str__(self):
         return self.name
 
 
 class Employer(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE, 
+        related_name='employer_profile', 
+        null=True, blank=True 
+                               
+    )
     first_name = models.CharField(db_column='firstName',max_length=255)
     middle_name = models.CharField(db_column='middleName', max_length=255, blank=True, null=True)
     last_name = models.CharField(db_column='lastName', max_length=255)
@@ -72,6 +82,7 @@ class Employer(models.Model):
         verbose_name = 'Employer'
         verbose_name_plural = 'Employers'
         db_table = 'employer'
+        managed = True
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -121,6 +132,7 @@ class JobSeeker(models.Model):
         verbose_name = 'Job Seeker'
         verbose_name_plural = 'Job Seekers'
         db_table = 'jobseeker'
+        managed = True
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -173,6 +185,8 @@ class Job(models.Model):
         blank=True, 
         null=True
     )
+    location = models.CharField(max_length=255, blank=True, null=True
+    )
     category = models.CharField(db_column='category',
         max_length=11, 
         choices=CATEGORY_CHOICES, 
@@ -194,6 +208,7 @@ class Job(models.Model):
         verbose_name_plural = 'Jobs'
         db_table = 'job'
         ordering = ['-posted_date']
+        managed = False
 
     def __str__(self):
         return self.job_title
@@ -231,6 +246,7 @@ class JobApplicant(models.Model):
         db_table = 'jobapplicant'
         unique_together = ('job', 'job_seeker')
         ordering = ['-application_time']
+        managed = True
 
     def __str__(self):
         return f"{self.job_seeker} applied for {self.job}"
@@ -256,6 +272,7 @@ class ClickHistory(models.Model):
         verbose_name_plural = 'Click Histories'
         db_table = 'clickhistory'
         ordering = ['-timestamp']
+        managed = False
 
     def __str__(self):
         return f"{self.job_seeker} clicked on {self.job} at {self.timestamp}"
@@ -268,6 +285,7 @@ class Message(models.Model):
         verbose_name = 'Message'
         verbose_name_plural = 'Messages'
         db_table = 'message'
+        managed = False
 
     def __str__(self):
         return f"Message {self.id}"
@@ -293,6 +311,7 @@ class Notification(models.Model):
         verbose_name_plural = 'Notifications'
         db_table = 'notification'
         ordering = ['-time']
+        managed = False
 
     def __str__(self):
         return f"Notification for {self.job_seeker} at {self.time}"
@@ -331,6 +350,7 @@ class Feedback(models.Model):
         verbose_name_plural = 'Feedbacks'
         db_table = 'feedback'
         ordering = ['-time']
+        managed = False
 
     def __str__(self):
         return f"Feedback from {self.job_seeker}"
@@ -358,6 +378,7 @@ class Resume(models.Model):
         verbose_name = 'Resume'
         verbose_name_plural = 'Resumes'
         db_table = 'resume'
+        managed = False
 
     def __str__(self):
         return f"Resume of {self.job_seeker} ({self.status})"
