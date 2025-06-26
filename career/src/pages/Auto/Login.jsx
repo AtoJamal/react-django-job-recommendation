@@ -62,7 +62,19 @@ const Login = () => {
                 response = await api.loginEmployer(formData);
                 window.location.href = 'http://localhost:5173/employeraccount';
             }
-            localStorage.setItem('user', JSON.stringify(response.data));
+            
+            // Store tokens and user data separately
+            localStorage.setItem('access_token', response.data.access);
+            localStorage.setItem('refresh_token', response.data.refresh);
+            localStorage.setItem('user', JSON.stringify({
+                id: response.data.user.id,
+                email: response.data.user.email,
+                username: response.data.user.username,
+                employer_id: response.data.user.employer_id,
+                first_name: response.data.user.first_name,
+                last_name: response.data.user.last_name,
+                user_type: response.data.user.user_type
+            }));
         } catch (err) {
             setError(err?.non_field_errors?.[0] || err?.detail || 'Login failed. Please check your credentials.');
         }

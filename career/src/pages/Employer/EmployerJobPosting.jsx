@@ -5,11 +5,11 @@ import '../../styles/pages/Employer/EmployerJobPosting.css';
 const EmployerJobPosting = () => {
     const [formData, setFormData] = useState({
         jobTitle: '',
-        location: '', 
-        requiredAge: '', 
+        location: '',
+        requiredAge: '',
         salary: '',
         category: 'IT',
-        experience: '', 
+        experience: '',
         quota: '',
         deadline: '',
         description: ''
@@ -60,7 +60,7 @@ const EmployerJobPosting = () => {
         try {
             const response = await api.postJob(jobData);
             console.log('Job posted successfully:', response.data);
-            
+
             setSuccess(true);
             // Reset form
             setFormData({
@@ -74,13 +74,13 @@ const EmployerJobPosting = () => {
                 deadline: '',
                 description: ''
             });
-            
+
         } catch (error) {
             console.error('Error posting job:', error);
-            setError(error.response?.data?.detail || 
-                    error.response?.data || 
-                    error.message || 
-                    'Failed to post job. Please try again.');
+            setError(error.response?.data?.detail ||
+                error.response?.data ||
+                error.message ||
+                'Failed to post job. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
@@ -89,20 +89,20 @@ const EmployerJobPosting = () => {
     return (
         <div className="job-posting-container">
             <h1>Post a New Job</h1>
-            
+
             {error && (
                 <div className="error-message">
                     {typeof error === 'object' ? JSON.stringify(error) : error}
                 </div>
             )}
-            
+
             {success && (
                 <div className="success-message">
                     Job posted successfully! It will be visible after admin approval.
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="job-posting-form">
+            <form onSubmit={handleSubmit} className="job-posting-form" style={{ opacity: isSubmitting ? 0.5 : 1 }} disabled={isSubmitting}>
                 <div className="form-group">
                     <label htmlFor="jobTitle">Job Title *</label>
                     <input
@@ -221,14 +221,20 @@ const EmployerJobPosting = () => {
                     ></textarea>
                 </div>
 
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     className="submit-btn"
                     disabled={isSubmitting}
                 >
                     {isSubmitting ? 'Posting...' : 'Post Job'}
                 </button>
             </form>
+
+            {isSubmitting && (
+                <div className="loading-message">
+                    Posting job... Please wait.
+                </div>
+            )}
         </div>
     );
 };

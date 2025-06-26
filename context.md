@@ -108,15 +108,11 @@ Admins:
 Module	Status	Notes
 Backend API	✅ Tested	Frontend successfully calls /api/jobseekers/
 Frontend UI	✅ Structured	Pages organized by role
-Database	✅ Connected	MySQL schema aligned, --fake used to sync
+Database	✅ Connected	MySQL schema aligned, 
 Auth	⚙️ Planned	Either Django or Firebase
 AI Model	⚙️ In Progress	Concept prepared, integration pending
 📈 Next Steps
-🔗 API Development & Integration
 
-    Build all CRUD APIs for job posting, editing, applying, saving, and recommending.
-
-    Connect React frontend to backend using Axios (job search, profile updates, apply, etc.).
 
 🧠 AI Model Integration
 
@@ -126,11 +122,7 @@ AI Model	⚙️ In Progress	Concept prepared, integration pending
 
     Log click and application behavior to improve the model over time.
 
-🔒 Authentication
 
-    Add user registration/login with token-based auth (JWT or Django Sessions).
-
-    Optional: switch to Firebase for multi-platform auth consistency.
 
 🛠 Admin Controls
 
@@ -146,31 +138,4 @@ AI Model	⚙️ In Progress	Concept prepared, integration pending
 
     Setup CORS properly between frontend and backend
 
-🧠 Cursor AI: How You Can Help
-
-Cursor AI can now assist with:
-
-    Generating Django serializers, views, and URLs faster.
-
-    Completing Axios calls and error handling in React.
-
-    Auto-writing repetitive forms and table rendering in React.
-
-    Assisting with AI model endpoint logic and feedback loops.
-
-Ensure that:
-
-    You don't reapply migrations manually again (they're already synced).
-
-    Frontend API calls should point to http://127.0.0.1:8000/api/... during dev.
-
-🚧 Future Improvements
-
-    Resume parsing and auto-fill user skills.
-
-    Chat between employers and job seekers.
-
-    PDF resume upload and AI-based evaluation.
-
-    Real-time analytics for admins using charting libraries.
 

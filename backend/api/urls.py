@@ -11,7 +11,6 @@ from .views import (
 router = DefaultRouter()
 router.register(r'admins', AdminViewSet)
 router.register(r'employers', EmployerViewSet)
-router.register(r'jobseekers', JobSeekerViewSet)
 router.register(r'jobs', JobViewSet)
 router.register(r'applications', JobApplicantViewSet)
 

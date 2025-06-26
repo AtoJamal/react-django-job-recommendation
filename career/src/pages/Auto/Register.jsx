@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Corrected syntax here
-import '../../styles/pages/JobSeeker/Register.css'; // Assuming this path is correct in your project
+import '../../styles/pages/JobSeeker/Register.css'; // Assuming this path is correct in the project
 import api from '../../api'; // Assuming this path is correct in your project
 import { motion } from 'framer-motion';
 import { FiSun, FiMoon } from 'react-icons/fi'; // Re-added react-icons
@@ -48,6 +48,14 @@ const Register = () => {
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 50) { // If scrolled more than 50px
+                if (Object.keys(errors).length > 0) {
+                    setError({
+                        general: 'Please fix the following errors:',
+                        fields: errors
+                    });
+                    setLoading(false);
+                    return;
+                }
                 setScrolled(true);
             } else {
                 setScrolled(false);
@@ -78,7 +86,10 @@ const Register = () => {
     /*
      * `error` state: Stores and displays any error messages from form submission or API calls.
      */
-    const [error, setError] = useState('');
+    const [error, setError] = useState({
+        general: '',
+        fields: {}
+    });
 
     /*
      * `loading` state: Indicates if the form submission is in progress.
@@ -115,6 +126,15 @@ const Register = () => {
     });
 
     // --- Data for dropdown/select inputs ---
+    const errorMessages = {
+        required: 'This field is required',
+        invalid: 'Please enter a valid value',
+        mismatch: 'Values do not match',
+        unique: 'This value is already in use',
+        format: 'Please enter the value in correct format',
+        length: 'Value must be at least 8 characters long'
+    };
+
     const GENDER_CHOICES = [
         { value: 'Male', label: 'Male' },
         { value: 'Female', label: 'Female' },
@@ -155,6 +175,8 @@ const Register = () => {
         { code: '+212', country: 'Morocco' }
     ];
 
+    let errors = {};
+
     /*
      * `handleChange` function: A generic handler for all text and select inputs.
      * Updates `formData` state based on the input's `name` attribute.
@@ -181,9 +203,39 @@ const Register = () => {
      * Includes error handling for network issues and API responses.
      */
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent default browser form submission
-        setError(''); // Clear any previous error messages
-        setLoading(true); // Show loading indicator
+        e.preventDefault();
+        setError({ general: '', fields: {} });
+        setLoading(true);
+
+        // Client-side validation
+        errors = {};
+
+        // Required fields
+        if (!formData.firstName) errors.firstName = errorMessages.required;
+        if (!formData.lastName) errors.lastName = errorMessages.required;
+        if (!formData.email) errors.email = errorMessages.required;
+        if (!formData.username) errors.username = errorMessages.required;
+        if (!formData.password) errors.password = errorMessages.required;
+        if (!formData.password2) errors.password2 = errorMessages.required;
+        if (formData.password !== formData.password2) errors.password2 = errorMessages.mismatch;
+        if (formData.password.length < 8) errors.password = errorMessages.length;
+        if (!formData.phone) errors.phone = errorMessages.required;
+        if (!formData.gender) errors.gender = errorMessages.required;
+        if (!formData.location) errors.location = errorMessages.required;
+
+        // Format validation
+        if (formData.phone && !/^[+]?[0-9]+$/.test(formData.phone)) {
+            errors.phone = errorMessages.format;
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setError({
+                general: 'Please fix the following errors:',
+                fields: errors
+            });
+            setLoading(false);
+            return;
+        }
 
         try {
             // Prepare the common submission data fields, including username and password2
@@ -236,40 +288,51 @@ const Register = () => {
                     navigate('/login', { state: { success: 'Registration successful! Please login.' } });
                 }
             }
-        }
-        catch (err) {
+        } catch (err) {
             console.error('Full error object:', err); // Log the complete error for debugging
 
             // Handle network errors (e.g., server unreachable)
             if (err.message === "Network Error") {
-                setError('Cannot connect to server. Please check your internet connection or server status.');
+                setError({
+                    general: 'Cannot connect to server. Please check your internet connection or server status.',
+                    fields: {}
+                });
                 return;
             }
 
             // Handle API response errors (e.g., HTTP 4xx, 5xx status codes)
             if (err.response) {
-                const errorData = err.response.data;
-                if (err.response.status === 400) {
-                    // Handle specific validation errors from the backend (e.g., "email: ['This field is required']")
-                    if (typeof errorData === 'object') {
-                        const errorMessages = [];
-                        for (const key in errorData) {
-                            if (Array.isArray(errorData[key])) {
-                                errorMessages.push(`${key}: ${errorData[key].join(', ')}`);
-                            } else if (typeof errorData[key] === 'string') {
-                                errorMessages.push(errorData[key]);
-                            }
-                        }
-                        setError(errorMessages.join('\n') || 'Invalid data submitted.');
-                    } else {
-                        setError(errorData.detail || 'Invalid data submitted.');
-                    }
-                } else {
-                    setError(errorData.detail || `Server error (${err.response.status}).`);
+                // Handle API validation errors
+                const apiErrors = err.response.data || {};
+
+                // Format errors for display
+                const formattedErrors = {
+                    general: '',
+                    fields: {}
+                };
+
+                // Handle general errors
+                if (apiErrors.detail) {
+                    formattedErrors.general = apiErrors.detail;
                 }
+
+                // Handle field-specific errors
+                Object.entries(apiErrors).forEach(([field, message]) => {
+                    if (field === 'non_field_errors') {
+                        formattedErrors.general = message.join(', ');
+                    } else if (Array.isArray(message)) {
+                        formattedErrors.fields[field] = message.join(', ');
+                    } else if (typeof message === 'string') {
+                        formattedErrors.fields[field] = message;
+                    }
+                });
+
+                setError(formattedErrors);
             } else {
-                // Catch-all for unknown errors
-                setError('Unknown error occurred. Check console for details.');
+                setError({
+                    general: 'An unexpected error occurred. Please try again later.',
+                    fields: {}
+                });
             }
         } finally {
             setLoading(false); // Hide loading indicator regardless of success or failure
@@ -278,6 +341,42 @@ const Register = () => {
 
     return (
         <div className={`careerplus-register-root ${theme}`}>
+            <style jsx>{`
+                .careerplus-register-error {
+                    background-color: #ffebee;
+                    border: 1px solid #ffcdd2;
+                    border-radius: 8px;
+                    padding: 16px;
+                    margin-bottom: 20px;
+                    color: #c62828;
+                }
+
+                .careerplus-register-error h3 {
+                    margin: 0 0 8px 0;
+                    color: #b71c1c;
+                }
+
+                .careerplus-register-error ul {
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+                }
+
+                .careerplus-register-error li {
+                    margin: 8px 0;
+                    padding: 8px;
+                    background-color: #fff3e0;
+                    border-radius: 4px;
+                }
+
+                .careerplus-register-input:invalid {
+                    border-color: #e57373;
+                }
+
+                .careerplus-register-label:has(input:invalid) {
+                    color: #c62828;
+                }
+            `}</style>
             {/* Header Section */}
             <motion.header
                 className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
@@ -323,8 +422,23 @@ const Register = () => {
                     <h1 className="careerplus-register-title">Create Account</h1>
                     <p className="careerplus-register-subtitle">Join us as a...</p>
 
-                    {/* Display error message if `error` state is not empty */}
-                    {error && <div className="careerplus-register-error">{error}</div>}
+                    {/* Display error messages */}
+                    {error.general && (
+                        <div className="careerplus-register-error">
+                            <h3>Registration Error</h3>
+                            <p>{error.general}</p>
+                        </div>
+                    )}
+                    {Object.keys(error.fields).length > 0 && (
+                        <div className="careerplus-register-error">
+                            <h3>Field Errors</h3>
+                            <ul>
+                                {Object.entries(error.fields).map(([field, message]) => (
+                                    <li key={field}>{message}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     {/* User Type Selection: Job Seeker or Employer */}
                     <div className="user-type-group">

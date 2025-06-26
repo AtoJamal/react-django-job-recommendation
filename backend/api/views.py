@@ -16,7 +16,8 @@ from .serializers import (
     JobApplicantSerializer,
     CompanySerializer,
     JobSeekerLoginSerializer,
-    EmployerLoginSerializer
+    EmployerLoginSerializer,
+    JobSeekerRegistrationSerializer
 )
 
 
@@ -27,17 +28,19 @@ class AdminViewSet(viewsets.ModelViewSet):
 
 class EmployerViewSet(viewsets.ModelViewSet):
     queryset = Employer.objects.all()
-    serializer_class = EmployerSerializer # Default serializer for retrieving/updating employers
+    serializer_class = EmployerSerializer
+
+    def get_permissions(self):
+        if self.action in ['login', 'register']:
+            return []  # No permissions required for login/register
+        return super().get_permissions()
 
     @action(detail=False, methods=['post'])
     def register(self, request):
-        
         serializer = EmployerRegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
         employer = serializer.save() 
-        # Optionally, we might want to log in the user immediately after registration
-        # and return JWT tokens. This would involve using Simple JWT's token generation.
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
@@ -45,24 +48,13 @@ class EmployerViewSet(viewsets.ModelViewSet):
         serializer = EmployerLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        # After validation, serializer.validated_data will contain the `user` object
         user = serializer.validated_data['user']
         
-        # --- Integrate with djangorestframework-simplejwt for token generation ---
         from rest_framework_simplejwt.tokens import RefreshToken
         
-        # Function to get tokens for a user (can be placed in a utils file or similar)
-        def get_tokens_for_user(user):
-            refresh = RefreshToken.for_user(user)
-            refresh['user_type'] = 'employer'
-            refresh['employer_id'] = user.employer_profile.id 
-
-            return {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }
-
-        tokens = get_tokens_for_user(user)
+        refresh = RefreshToken.for_user(user)
+        refresh['user_type'] = 'employer'
+        refresh['employer_id'] = user.employer_profile.id 
 
         response_data = {
             'message': 'Login successful',
@@ -71,53 +63,127 @@ class EmployerViewSet(viewsets.ModelViewSet):
                 'email': user.email,
                 'username': user.username,
                 'employer_id': user.employer_profile.id,
-                'first_name': user.employer_profile.first_name, # Get from employer profile
+                'first_name': user.employer_profile.first_name,
                 'last_name': user.employer_profile.last_name,
                 'user_type': 'employer'
             },
-            'access_token': tokens['access'],
-            'refresh_token': tokens['refresh'],
+            'access': str(refresh.access_token),
+            'refresh': str(refresh)
         }
+        
         return Response(response_data, status=status.HTTP_200_OK)
     
-class JobSeekerViewSet(viewsets.ModelViewSet):
-    queryset = JobSeeker.objects.all()
-    serializer_class = JobSeekerSerializer
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import JobSeeker
+from .serializers import JobSeekerRegistrationSerializer, JobSeekerLoginSerializer
+
+class JobSeekerViewSet(viewsets.ViewSet):
+    def get_permissions(self):
+        if self.action in ['register', 'login']:
+            return []  # No permissions required for login/register
+        return super().get_permissions()
 
     @action(detail=False, methods=['post'])
     def register(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        serializer = JobSeekerRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                job_seeker = serializer.save()
+                
+                # Generate JWT tokens
+                refresh = RefreshToken.for_user(job_seeker.user)
+                refresh['user_type'] = 'jobseeker'
+                refresh['jobseeker_id'] = job_seeker.id
+
+                response_data = {
+                    'message': 'Registration successful',
+                    'user': {
+                        'id': job_seeker.user.id,
+                        'email': job_seeker.user.email,
+                        'username': job_seeker.user.username,
+                        'jobseeker_id': job_seeker.id,
+                        'first_name': job_seeker.first_name,
+                        'last_name': job_seeker.last_name,
+                        'user_type': 'jobseeker'
+                    },
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh)
+                }
+                return Response(response_data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'])
     def login(self, request):
-        serializer = JobSeekerLoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
-
-    def perform_create(self, serializer):
-        # Handle password hashing
-        password = serializer.validated_data.pop('password', None)
-        instance = serializer.save()
+        email = request.data.get('email')
+        password = request.data.get('password')
         
-        if password:
-            instance.password = make_password(password)
-            instance.save()
+        if not email or not password:
+            return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            user = User.objects.get(email=email)
+            if user.check_password(password):
+                job_seeker = JobSeeker.objects.get(user=user)
+                
+                # Generate JWT tokens
+                refresh = RefreshToken.for_user(user)
+                refresh['user_type'] = 'jobseeker'
+                refresh['jobseeker_id'] = job_seeker.id
+
+                return Response({
+                    'message': 'Login successful',
+                    'user': {
+                        'id': user.id,
+                        'email': user.email,
+                        'username': user.username,
+                        'jobseeker_id': job_seeker.id,
+                        'first_name': job_seeker.first_name,
+                        'last_name': job_seeker.last_name,
+                        'user_type': 'jobseeker'
+                    },
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh)
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        except (User.DoesNotExist, JobSeeker.DoesNotExist):
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class JobViewSet(viewsets.ModelViewSet):
-    queryset = Job.objects.all().order_by('-posted_date')
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Job.objects.all()  # Added for DRF router compatibility
     serializer_class = JobSerializer
-    filter_backends = [filters.SearchFilter]  # Start with just search
-    search_fields = ['job_title', 'description']  # Basic search fields
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['job_title', 'description']
+
+    def get_queryset(self):
+        # Only show approved jobs to everyone
+        return Job.objects.filter(is_approved=True).order_by('-posted_date')
 
     def perform_create(self, serializer):
-        if hasattr(self.request.user, 'employer'):
-            serializer.save(employer=self.request.user.employer)
+        # Set employer and is_approved
+        employer = getattr(self.request.user, 'employer_profile', None)
+        if employer:
+            serializer.save(employer=employer, is_approved=False)
         else:
-            serializer.save()
+            serializer.save(is_approved=False)
+
+    def get_permissions(self):
+        # Only authenticated users can create jobs
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAuthenticated()]
+        return super().get_permissions()
 
 class JobApplicantViewSet(viewsets.ModelViewSet):
     queryset = JobApplicant.objects.all()

@@ -198,6 +198,7 @@ class Job(models.Model):
         blank=True,
         null=True
     )
+    is_approved = models.BooleanField(db_column='is_approved', default=False)
     quota = models.PositiveIntegerField(db_column='quota',blank=True, null=True)
     deadline = models.DateField(db_column='deadline',blank=True, null=True)
     description = models.TextField(db_column='description',blank=True, null=True)
