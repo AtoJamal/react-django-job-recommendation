@@ -3,7 +3,7 @@ import NotificationCard from '../../components/JobSeeker/NotificationCard';
 import '../../styles/pages/JobSeeker/NotificationList.css';
 
 const NotificationList = () => {
-    // Mock notification data
+   
     const [notifications, setNotifications] = useState([
         {
             id: 1,

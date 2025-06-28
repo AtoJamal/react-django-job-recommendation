@@ -163,7 +163,8 @@ const Welcome = () => {
                         transition={{ duration: 0.8, delay: 0.6 }}
                         className="careerplus__hero-buttons"
                     >
-                        <button className="careerplus__hero-btn careerplus__hero-btn--primary">
+                        <button 
+                        className="careerplus__hero-btn careerplus__hero-btn--primary">
                             Get Started <FiArrowRight />
                         </button>
                         <button className="careerplus__hero-btn careerplus__hero-btn--secondary">

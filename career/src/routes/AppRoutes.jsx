@@ -17,7 +17,7 @@ import Resume from '../pages/JobSeeker/Resume';
 
 import EmployerAccount from '../pages/Employer/EmployerAccount';
 import EmployerJobPosting from '../pages/Employer/EmployerJobPosting';
-import DepartmentForm from '../pages/Employer/DepartmentForm';
+
 // Admin Imports
 import AdminEmployerList from '../pages/Admin/AdminEmployerList';
 import AdminProfile from '../pages/Admin/AdminProfile';
@@ -28,7 +28,7 @@ import AdminPostedJobDetail from '../pages/Admin/AdminPostedJobDetail';
 import AdminPostedJobList from '../pages/Admin/AdminPostedJobList';
 
 // import ProtectedRoute
-import ProtectedRoute from '../components/ProtectedRoute';
+
 import JobSeekersList from '../testJobSeekersList';
 import App from '../App';
 
@@ -50,11 +50,13 @@ const AppRoutes = () => (
         <Route path="/jobsearch" element={<JobSearch />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/notificationlist" element={<ProtectedRoute><NotificationList /></ProtectedRoute>} />
+        <Route path="/notificationlist" element={<NotificationList />} />
         <Route path="/jobapplication" element={<JobApplication />} />
         <Route path="/employeraccount" element={<EmployerAccount />} />
         <Route path="/employerjobposting" element={<EmployerJobPosting />} />
         <Route path="/jobseekerslist" element={<JobSeekersList />} />
+
+        <Route path="/jobs/:jobId/apply" element={<JobApplication />} />
     </Routes>
 
 

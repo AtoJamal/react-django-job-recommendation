@@ -21,7 +21,6 @@ from .serializers import (
 )
 
 
-
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = Admin.objects.all()
     serializer_class = AdminSerializer
@@ -186,8 +185,23 @@ class JobViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 class JobApplicantViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = JobApplicant.objects.all()
     serializer_class = JobApplicantSerializer
 
+    def perform_create(self, serializer):
+        # Get the job seeker profile for the current user
+        job_seeker = self.request.user.jobseeker_profile
+        serializer.save(job_seeker=job_seeker)
+
+    def get_queryset(self):
+        # Job seekers can only see their own applications
+        if hasattr(self.request.user, 'jobseeker_profile'):
+            return self.queryset.filter(job_seeker=self.request.user.jobseeker_profile)
+        # Employers can see applications for their jobs
+        elif hasattr(self.request.user, 'employer_profile'):
+            return self.queryset.filter(job__employer=self.request.user.employer_profile)
+        return self.queryset.none()
 
 

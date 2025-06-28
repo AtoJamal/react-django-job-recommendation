@@ -1,71 +1,149 @@
-/* Base Styles */
-.job-application-page {
+:root {
+    --jobapplication-bg-light: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+    --jobapplication-bg-dark: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --jobapplication-card-bg-light: rgba(255,255,255,0.85);
+    --jobapplication-card-bg-dark: rgba(30,41,59,0.85);
+    --jobapplication-card-blur: 18px;
+    --jobapplication-card-border-light: rgba(59,130,246,0.12);
+    --jobapplication-card-border-dark: rgba(59,130,246,0.25);
+    --jobapplication-shadow: 0 8px 32px rgba(37,99,235,0.10), 0 1.5px 8px rgba(0,0,0,0.10);
+    --jobapplication-title-light: #1e293b;
+    --jobapplication-title-dark: #f8fafc;
+    --jobapplication-subtitle-light: #64748b;
+    --jobapplication-subtitle-dark: #cbd5e1;
+    --jobapplication-input-bg-light: #f8fafc;
+    --jobapplication-input-bg-dark: #1e293b;
+    --jobapplication-input-border: #3b82f6;
+    --jobapplication-btn-gradient: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+    --jobapplication-btn-gradient-hover: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+    --jobapplication-btn-text: #fff;
+    --jobapplication-link: #3b82f6;
+    --jobapplication-link-hover: #256 hetk: #2563eb;
+    --jobapplication-error: #ef4444;
+    --jobapplication-success: #2e7d32;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.careerplus-jobapplication-root {
     min-height: 100vh;
-    background-color: #f8fafc;
-    padding: 40px 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    background: var(--jobapplication-bg-light);
 }
 
-.application-container {
+.careerplus-jobapplication-root.dark {
+    background: var(--jobapplication-bg-dark);
+}
+
+.careerplus-jobapplication-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 2rem 1rem;
+    margin-top: 6.5rem;
+}
+
+.careerplus-jobapplication-card {
+    background: var(--jobapplication-card-bg-light);
+    border-radius: 1.5rem;
+    box-shadow: var(--jobapplication-shadow);
+    padding: 2.5rem 2rem;
     max-width: 800px;
-    margin: 0 auto;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 40px;
-    border: 2px solid rgba(15, 19, 243, 0.274);
-    border-radius: 10px;
-}
-
-.application-container h1 {
-    color: #2563eb;
-    margin-bottom: 8px;
-    font-size: 2rem;
-}
-
-.subtitle {
-    color: #64748b;
-    margin-bottom: 30px;
-    font-size: 1.1rem;
-}
-
-/* Form Styles */
-.application-form {
+    width: 100%;
+    border: 1.5px solid var(--jobapplication-card-border-light);
+    backdrop-filter: blur(var(--jobapplication-card-blur));
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    align-items: stretch;
 }
 
-.form-group {
+.careerplus-jobapplication-root.dark .careerplus-jobapplication-card {
+    background: var(--jobapplication-card-bg-dark);
+    border: 1.5px solid var(--jobapplication-card-border-dark);
+}
+
+.careerplus-jobapplication-card:hover {
+    transform: translateY(-6px) scale(1.012);
+    box-shadow: 0 20px 40px 0 rgba(37,99,235,0.13), 0 8px 24px 0 rgba(0,0,0,0.18);
+    border-color: #3b82f6;
+}
+
+.careerplus-jobapplication-title {
+    font-size: 2.1rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    color: var(--jobapplication-title-light);
+    letter-spacing: -1px;
+}
+
+.careerplus-jobapplication-root.dark .careerplus-jobapplication-title {
+    color: var(--jobapplication-title-dark);
+}
+
+.careerplus-jobapplication-subtitle {
+    color: var(--jobapplication-subtitle-light);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.08rem;
+}
+
+.careerplus-jobapplication-root.dark .careerplus-jobapplication-subtitle {
+    color: var(--jobapplication-subtitle-dark);
+}
+
+.careerplus-jobapplication-form {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 1.5rem;
 }
 
-.form-group label {
+.careerplus-jobapplication-label {
     font-weight: 600;
-    color: #334155;
+    color: var(--jobapplication-title-light);
     font-size: 1rem;
+    margin-bottom: 0.3rem;
 }
 
-.form-group textarea {
-    padding: 12px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 1rem;
+.careerplus-jobapplication-root.dark .careerplus-jobapplication-label {
+    color: var(--jobapplication-title-dark);
+}
+
+.careerplus-jobapplication-input {
+    padding: 0.85rem 1.1rem;
+    border-radius: 0.75rem;
+    border: 1.5px solid #e2e8f0;
+    background: var(--jobapplication-input-bg-light);
+    font-size: 1.05rem;
+    color: var(--jobapplication-title-light);
+    transition: border-color 0.3s, background 0.3s;
+    outline: none;
+    margin-top: 0.1rem;
+    width: 100%;
     font-family: inherit;
     resize: vertical;
     min-height: 100px;
-    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.form-group textarea:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+.careerplus-jobapplication-root.dark .careerplus-jobapplication-input {
+    background: var(--jobapplication-input-bg-dark);
+    color: var(--jobapplication-title-dark);
+    border: 1.5px solid #334155;
 }
 
-/* File Upload Styles */
+.careerplus-jobapplication-input:focus {
+    border-color: var(--jobapplication-input-border);
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.13);
+}
+
 .file-upload {
     display: flex;
     align-items: center;
@@ -77,7 +155,7 @@
     align-items: center;
     gap: 8px;
     padding: 12px 16px;
-    background-color: #f8fafc;
+    background: var(--jobapplication-input-bg-light);
     border: 1px dashed #cbd5e1;
     border-radius: 8px;
     cursor: pointer;
@@ -85,20 +163,33 @@
     transition: background-color 0.3s;
 }
 
+.careerplus-jobapplication-root.dark .upload-label {
+    background: var(--jobapplication-input-bg-dark);
+    border: 1px dashed #475569;
+}
+
 .upload-label:hover {
-    background-color: #f1f5f9;
+    background: #f1f5f9;
+}
+
+.careerplus-jobapplication-root.dark .upload-label:hover {
+    background: #2d3748;
 }
 
 .upload-icon {
-    color: #2563eb;
+    color: var(--jobapplication-link);
     font-size: 1.2rem;
 }
 
 .upload-label span {
-    color: #64748b;
+    color: var(--jobapplication-subtitle-light);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.careerplus-jobapplication-root.dark .upload-label span {
+    color: var(--jobapplication-subtitle-dark);
 }
 
 .upload-label input[type="file"] {
@@ -108,7 +199,7 @@
 .remove-file {
     background: none;
     border: none;
-    color: #ef4444;
+    color: var(--jobapplication-error);
     cursor: pointer;
     font-weight: 600;
     padding: 8px 12px;
@@ -117,120 +208,323 @@
 }
 
 .remove-file:hover {
-    background-color: #fee2e2;
+    background: #fee2e2;
+}
+
+.careerplus-jobapplication-root.dark .remove-file:hover {
+    background: #7f1d1d;
 }
 
 .file-hint {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--jobapplication-subtitle-light);
     margin-top: 4px;
 }
 
-/* Resume Attachment */
-.attach-resume {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    background-color: #f0f7ff;
-    border: 1px solid #bfdbfe;
-    border-radius: 8px;
-    color: #2563eb;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s;
+.careerplus-jobapplication-root.dark .file-hint {
+    color: var(--jobapplication-subtitle-dark);
 }
 
-.attach-resume:hover {
-    background-color: #dbeafe;
+.resume-attachment {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--jobapplication-input-bg-light);
+    border-radius: 4px;
+}
+
+.careerplus-jobapplication-root.dark .resume-attachment {
+    background: var(--jobapplication-input-bg-dark);
 }
 
 .attach-icon {
     font-size: 1.2rem;
+    color: var(--jobapplication-link);
 }
 
-.resume-hint {
-    font-size: 0.85rem;
-    color: #64748b;
-    margin-top: 4px;
+.resume-attachment span {
+    color: var(--jobapplication-title-light);
 }
 
-/* Submit Button */
-.form-actions {
-    margin-top: 20px;
+.careerplus-jobapplication-root.dark .resume-attachment span {
+    color: var(--jobapplication-title-dark);
 }
 
-.submit-button {
-    width: 100%;
-    padding: 14px;
-    background-color: #2563eb;
-    color: white;
+.resume-missing {
+    color: var(--jobapplication-error);
+    font-style: italic;
+}
+
+.careerplus-jobapplication-btn {
+    background: var(--jobapplication-btn-gradient);
+    color: var(--jobapplication-btn-text);
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
+    padding: 0.95rem 0;
+    border-radius: 0.75rem;
+    font-size: 1.08rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s;
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    display: block;
+    width: 100%;
 }
 
-.submit-button:hover {
-    background-color: #1d4ed8;
+.careerplus-jobapplication-btn:hover {
+    background: var(--jobapplication-btn-gradient-hover);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 24px 0 #2563eb33;
 }
 
-.submit-button:disabled {
-    background-color: #93c5fd;
+.careerplus-jobapplication-btn:disabled {
+    background: #b0bec5;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-/* Success Message */
-.success-message {
+.careerplus-jobapplication-error {
+    color: var(--jobapplication-error);
+    background: #fee2e2;
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    text-align: center;
+    border: 1px solid #ef4444;
+    animation: shake 0.2s 1;
+}
+
+.careerplus-jobapplication-root.dark .careerplus-jobapplication-error {
+    background: #7f1d1d;
+    color: #fee2e2;
+    border: 1px solid #ef4444;
+}
+
+.careerplus-jobapplication-success {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 15px 20px;
-    background-color: #ecfdf5;
+    padding: 0.7rem 1rem;
+    background: #edf7ed;
     border: 1px solid #a7f3d0;
-    border-radius: 8px;
-    color: #065f46;
-    margin-top: 20px;
+    border-radius: 6px;
+    color: var(--jobapplication-success);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.careerplus-jobapplication-root.dark .careerplus-jobapplication-success {
+    background: #1a3c1b;
+    color: #edf7ed;
+    border: 1px solid #a7f3d0;
 }
 
 .success-icon {
     font-size: 1.5rem;
-    color: #10b981;
+    color: var(--jobapplication-success);
 }
 
-.success-message p {
-    margin: 0;
-    font-weight: 600;
+.careerplus-jobapplication-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.2rem;
+    color: var(--jobapplication-title-light);
 }
 
-/* Responsive Design */
+.careerplus-jobapplication-root.dark .careerplus-jobapplication-loading {
+    color: var(--jobapplication-title-dark);
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}
+
 @media (max-width: 768px) {
-    .application-container {
-        padding: 30px;
+    .careerplus-jobapplication-card {
+        padding: 1.5rem 0.7rem;
+        border-radius: 1rem;
     }
-}
-
-@media (max-width: 480px) {
-    .job-application-page {
-        padding: 20px 15px;
+    .careerplus-jobapplication-title {
+        font-size: 1.5rem;
     }
-
-    .application-container {
-        padding: 25px 20px;
-    }
-
-    .application-container h1 {
-        font-size: 1.8rem;
-    }
-
     .file-upload {
         flex-direction: column;
         align-items: stretch;
     }
-
     .remove-file {
         align-self: flex-end;
     }
+}
+
+@media (max-width: 480px) {
+    .careerplus-jobapplication-main {
+        padding: 1rem;
+    }
+}
+
+/* Header Styles */
+.careerplus__header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 1rem 2rem;
+    transition: background-color 0.3s ease;
+}
+
+.careerplus__header.scrolled {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.careerplus__header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.careerplus__logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--jobapplication-title-light);
+    margin: 0;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__logo {
+    color: var(--jobapplication-title-dark);
+}
+
+.careerplus__nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.careerplus__nav-icon, .careerplus__theme-toggle {
+    background: none;
+    border: none;
+    color: var(--jobapplication-title-light);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__nav-icon,
+.careerplus-jobapplication-root.dark .careerplus__theme-toggle {
+    color: var(--jobapplication-title-dark);
+}
+
+.careerplus__nav-icon:hover, .careerplus__theme-toggle:hover {
+    color: var(--jobapplication-link);
+}
+
+/* Footer Styles */
+.careerplus__footer {
+    background: var(--jobapplication-footer-bg-light);
+    border-top: 1.5px solid var(--jobapplication-footer-border-light);
+    padding: 4rem 0 2rem;
+    width: 100%;
+    position: relative;
+    z-index: 10;
+    margin-top: auto;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__footer {
+    background: var(--jobapplication-footer-bg-dark);
+    border-top: 1.5px solid var(--jobapplication-footer-border-dark);
+}
+
+.careerplus__footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 3rem;
+}
+
+.careerplus__footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.careerplus__footer-text {
+    color: var(--jobapplication-subtitle-light);
+    line-height: 1.6;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__footer-text {
+    color: var(--jobapplication-subtitle-dark);
+}
+
+.careerplus__footer-heading {
+    color: var(--jobapplication-title-light);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__footer-heading {
+    color: var(--jobapplication-title-dark);
+}
+
+.careerplus__footer-link {
+    color: var(--jobapplication-subtitle-light);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.75rem;
+    transition: color 0.2s;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__footer-link {
+    color: var(--jobapplication-subtitle-dark);
+}
+
+.careerplus__footer-link:hover {
+    color: var(--jobapplication-link);
+}
+
+.careerplus__social-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.careerplus__social-icon {
+    color: var(--jobapplication-subtitle-light);
+    font-size: 1.5rem;
+    transition: color 0.2s;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__social-icon {
+    color: var(--jobapplication-subtitle-dark);
+}
+
+.careerplus__social-icon:hover {
+    color: var(--jobapplication-link);
+}
+
+.careerplus__footer-bottom {
+    max-width: 1200px;
+    margin: 3rem auto 0;
+    padding: 2rem 2rem 0;
+    border-top: 1px solid var(--jobapplication-footer-border-light);
+    text-align: center;
+    color: var(--jobapplication-subtitle-light);
+}
+
+.careerplus-jobapplication-root.dark .careerplus__footer-bottom {
+    border-top-color: var(--jobapplication-footer-border-dark);
+    color: var(--jobapplication-subtitle-dark);
 }

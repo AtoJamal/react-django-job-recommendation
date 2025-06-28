@@ -1,50 +1,33 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Corrected syntax here
-import '../../styles/pages/JobSeeker/Register.css'; // Assuming this path is correct in the project
-import api from '../../api'; // Assuming this path is correct in your project
+import { Link, useNavigate } from 'react-router-dom'; 
+import '../../styles/pages/JobSeeker/Register.css'; 
+import api from '../../api'; 
 import { motion } from 'framer-motion';
-import { FiSun, FiMoon } from 'react-icons/fi'; // Re-added react-icons
-import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa'; // Re-added react-icons
+import { FiSun, FiMoon } from 'react-icons/fi'; 
+import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa'; 
 
 const Register = () => {
-    /*
-     * `useNavigate` is a hook from `react-router-dom` used for programmatic navigation.
-     * It allows changing the URL and pushing/replacing entries in the history stack.
-     */
+   
     const navigate = useNavigate();
 
-    /*
-     * `scrolled` state: Controls whether the header has been scrolled past a certain point.
-     * Used for applying different styles (e.g., box-shadow) when scrolling.
-     */
+  
     const [scrolled, setScrolled] = useState(false);
 
-    /*
-     * `theme` state: Manages the current theme ('light' or 'dark').
-     * It initializes from localStorage or defaults based on user's system preference.
-     */
+   
     const [theme, setTheme] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
-        // If no theme is saved, check system preference
+ 
         if (!savedTheme) {
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
         return savedTheme;
     });
 
-    /*
-     * Effect to apply the theme to the document's `data-theme` attribute and save to localStorage.
-     * This allows CSS variables to react to theme changes.
-     */
+    
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
-    }, [theme]); // Reruns whenever `theme` changes
-
-    /*
-     * Effect to handle scroll events for the header.
-     * Adds or removes the 'scrolled' class based on scroll position.
-     */
+    }, [theme]); 
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 50) { // If scrolled more than 50px
@@ -110,22 +93,22 @@ const Register = () => {
         countryCode: '+1', // Default country code for phone number
         phone: '',
         email: '',
-        username: '',   // Re-added: Username for Django User model
+        username: '',  
         password: '',
-        password2: '',  // Re-added: Password confirmation for Django User model
-        // Job Seeker specific fields
+        password2: '', 
+
         degree: '',
         experience: '',
         graduationYear: '',
         fieldOfStudy: '',
-        // Employer specific fields (for company details if 'hasCompany' is true)
+        
         companyName: '',
         companyLocation: '',
         employeesCount: '',
         establishmentYear: ''
     });
 
-    // --- Data for dropdown/select inputs ---
+   
     const errorMessages = {
         required: 'This field is required',
         invalid: 'Please enter a valid value',

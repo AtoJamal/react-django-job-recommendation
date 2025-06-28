@@ -128,6 +128,13 @@ class JobSeeker(models.Model):
     )
     field_of_study = models.CharField(db_column='fieldOfStudy',max_length=16, choices=FIELD_OF_STUDY_CHOICES)
 
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='jobseeker_profile',
+        null=True, blank=True
+    )
+
     class Meta:
         verbose_name = 'Job Seeker'
         verbose_name_plural = 'Job Seekers'
