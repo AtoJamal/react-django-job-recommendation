@@ -18,7 +18,7 @@
     --jobapplication-btn-gradient-hover: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
     --jobapplication-btn-text: #fff;
     --jobapplication-link: #3b82f6;
-    --jobapplication-link-hover: #256 hetk: #2563eb;
+    --jobapplication-link-hover: #2563eb;
     --jobapplication-error: #ef4444;
     --jobapplication-success: #2e7d32;
 }
@@ -81,23 +81,22 @@
     font-weight: 800;
     margin-bottom: 0.5rem;
     text-align: center;
-    color: var(--jobapplication-title-light);
-    letter-spacing: -1px;
+    color: var(--jobsearch-title-light);
 }
 
 .careerplus-jobapplication-root.dark .careerplus-jobapplication-title {
-    color: var(--jobapplication-title-dark);
+    color: var(--jobsearch-title-dark);
 }
 
 .careerplus-jobapplication-subtitle {
-    color: var(--jobapplication-subtitle-light);
+    color: var(--jobsearch-subtitle-light);
     text-align: center;
     margin-bottom: 2rem;
     font-size: 1.08rem;
 }
 
 .careerplus-jobapplication-root.dark .careerplus-jobapplication-subtitle {
-    color: var(--jobapplication-subtitle-dark);
+    color: var(--jobsearch-subtitle-dark);
 }
 
 .careerplus-jobapplication-form {
@@ -108,13 +107,13 @@
 
 .careerplus-jobapplication-label {
     font-weight: 600;
-    color: var(--jobapplication-title-light);
+    color: var(--jobsearch-title-light);
     font-size: 1rem;
     margin-bottom: 0.3rem;
 }
 
 .careerplus-jobapplication-root.dark .careerplus-jobapplication-label {
-    color: var(--jobapplication-title-dark);
+    color: var(--jobsearch-title-dark);
 }
 
 .careerplus-jobapplication-input {
@@ -123,7 +122,7 @@
     border: 1.5px solid #e2e8f0;
     background: var(--jobapplication-input-bg-light);
     font-size: 1.05rem;
-    color: var(--jobapplication-title-light);
+    color: var(--jobsearch-title-light);
     transition: border-color 0.3s, background 0.3s;
     outline: none;
     margin-top: 0.1rem;
@@ -135,7 +134,7 @@
 
 .careerplus-jobapplication-root.dark .careerplus-jobapplication-input {
     background: var(--jobapplication-input-bg-dark);
-    color: var(--jobapplication-title-dark);
+    color: var(--jobsearch-title-dark);
     border: 1.5px solid #334155;
 }
 
@@ -182,14 +181,11 @@
 }
 
 .upload-label span {
-    color: var(--jobapplication-subtitle-light);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--jobsearch-subtitle-light);
 }
 
 .careerplus-jobapplication-root.dark .upload-label span {
-    color: var(--jobapplication-subtitle-dark);
+    color: var(--jobsearch-subtitle-dark);
 }
 
 .upload-label input[type="file"] {
@@ -217,12 +213,12 @@
 
 .file-hint {
     font-size: 0.85rem;
-    color: var(--jobapplication-subtitle-light);
+    color: var(--jobsearch-subtitle-light);
     margin-top: 4px;
 }
 
 .careerplus-jobapplication-root.dark .file-hint {
-    color: var(--jobapplication-subtitle-dark);
+    color: var(--jobsearch-subtitle-dark);
 }
 
 .resume-attachment {
@@ -244,11 +240,11 @@
 }
 
 .resume-attachment span {
-    color: var(--jobapplication-title-light);
+    color: var(--jobsearch-title-light);
 }
 
 .careerplus-jobapplication-root.dark .resume-attachment span {
-    color: var(--jobapplication-title-dark);
+    color: var(--jobsearch-title-dark);
 }
 
 .resume-missing {
@@ -333,11 +329,11 @@
     align-items: center;
     height: 100vh;
     font-size: 1.2rem;
-    color: var(--jobapplication-title-light);
+    color: var(--jobsearch-title-light);
 }
 
 .careerplus-jobapplication-root.dark .careerplus-jobapplication-loading {
-    color: var(--jobapplication-title-dark);
+    color: var(--jobsearch-title-dark);
 }
 
 @keyframes shake {
@@ -346,6 +342,226 @@
     50% { transform: translateX(4px); }
     75% { transform: translateX(-4px); }
     100% { transform: translateX(0); }
+}
+
+/* Header Styles */
+.careerplus__header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    backdrop-filter: blur(var(--jobsearch-header-blur));
+    border-bottom: 1.5px solid var(--jobsearch-header-border-light);
+    background: var(--jobsearch-header-bg-light);
+    transition: all 0.3s;
+    box-shadow: 0 2px 12px 0 rgba(37,99,235,0.04);
+}
+
+.careerplus-jobapplication-root.dark .careerplus__header {
+    background: var(--jobsearch-header-bg-dark);
+    border-bottom: 1.5px solid var(--jobsearch-header-border-dark);
+}
+
+.careerplus__header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.careerplus__logo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--jobsearch-title-light);
+    letter-spacing: -1px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__logo {
+    color: var(--jobsearch-title-dark);
+}
+
+.careerplus__nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.careerplus__nav-icon {
+    background: none;
+    border: none;
+    color: var(--jobsearch-icon);
+    font-size: 1.45rem;
+    cursor: pointer;
+    padding: 0.45rem;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.careerplus__nav-icon:hover, .careerplus__nav-icon:focus {
+    background: rgba(59,130,246,0.10);
+    color: var(--jobsearch-icon-hover);
+    box-shadow: 0 2px 8px 0 rgba(37,99,235,0.10);
+}
+
+.careerplus-jobapplication-root.dark .careerplus__nav-icon {
+    color: #60a5fa;
+    background: none;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__nav-icon:hover,
+.careerplus-jobapplication-root.dark .careerplus__nav-icon:focus {
+    background: rgba(59,130,246,0.18);
+    color: #fff;
+}
+
+.careerplus__theme-toggle {
+    background: none;
+    border: none;
+    color: var(--jobsearch-icon);
+    font-size: 1.45rem;
+    cursor: pointer;
+    padding: 0.45rem;
+    border-radius: 50%;
+    margin-left: 0.5rem;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.careerplus__theme-toggle:hover, .careerplus__theme-toggle:focus {
+    background: rgba(59,130,246,0.10);
+    color: var(--jobsearch-icon-hover);
+}
+
+.careerplus-jobapplication-root.dark .careerplus__theme-toggle {
+    color: #60a5fa;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__theme-toggle:hover,
+.careerplus-jobapplication-root.dark .careerplus__theme-toggle:focus {
+    background: rgba(59,130,246,0.18);
+    color: #fff;
+}
+
+/* Footer Styles */
+.careerplus__footer {
+    background: var(--jobsearch-footer-bg-light);
+    border-top: 1.5px solid var(--jobsearch-footer-border-light);
+    box-shadow: 0 -2px 12px 0 rgba(37,99,235,0.04);
+    padding: 2.5rem 0 1.2rem 0;
+    margin-top: 2rem;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__footer {
+    background: var(--jobsearch-footer-bg-dark);
+    border-top: 1.5px solid var(--jobsearch-footer-border-dark);
+}
+
+.careerplus__footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2.5rem;
+    padding: 0 2rem;
+}
+
+.careerplus__footer-brand {
+    flex: 1 1 220px;
+}
+
+.careerplus__footer-links,
+.careerplus__footer-contact,
+.careerplus__footer-social {
+    flex: 1 1 180px;
+}
+
+.careerplus__footer-heading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+    color: var(--jobsearch-title-light);
+}
+
+.careerplus-jobapplication-root.dark .careerplus__footer-heading {
+    color: var(--jobsearch-title-dark);
+}
+
+.careerplus__footer-link {
+    display: block;
+    color: var(--jobsearch-link);
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.careerplus__footer-link:hover,
+.careerplus__footer-link:focus {
+    color: var(--jobsearch-link-hover);
+    text-decoration: underline;
+}
+
+.careerplus__footer-text {
+    color: var(--jobsearch-subtitle-light);
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__footer-text {
+    color: var(--jobsearch-subtitle-dark);
+}
+
+.careerplus__footer-social {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.careerplus__social-icons {
+    display: flex;
+    gap: 1.1rem;
+    margin-top: 0.2rem;
+}
+
+.careerplus__social-icon {
+    color: var(--jobsearch-link);
+    font-size: 1.35rem;
+    transition: color 0.2s;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__social-icon {
+    color: #60a5fa;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__social-icon:hover,
+.careerplus-jobapplication-root.dark .careerplus__social-icon:focus {
+    color: #fff;
+}
+
+.careerplus__footer-bottom {
+    text-align: center;
+    color: var(--jobsearch-subtitle-light);
+    font-size: 0.98rem;
+    margin-top: 2.2rem;
+}
+
+.careerplus-jobapplication-root.dark .careerplus__footer-bottom {
+    color: var(--jobsearch-subtitle-dark);
 }
 
 @media (max-width: 768px) {
@@ -371,160 +587,31 @@
     }
 }
 
-/* Header Styles */
-.careerplus__header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    padding: 1rem 2rem;
-    transition: background-color 0.3s ease;
+@media (max-width: 900px) {
+    .careerplus__header-container,
+    .careerplus__footer-container {
+        padding: 1rem 1rem;
+    }
+    
+    .careerplus__footer-container {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
 }
 
-.careerplus__header.scrolled {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.careerplus__header-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.careerplus__logo {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--jobapplication-title-light);
-    margin: 0;
-}
-
-.careerplus-jobapplication-root.dark .careerplus__logo {
-    color: var(--jobapplication-title-dark);
-}
-
-.careerplus__nav {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.careerplus__nav-icon, .careerplus__theme-toggle {
-    background: none;
-    border: none;
-    color: var(--jobapplication-title-light);
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.careerplus-jobapplication-root.dark .careerplus__nav-icon,
-.careerplus-jobapplication-root.dark .careerplus__theme-toggle {
-    color: var(--jobapplication-title-dark);
-}
-
-.careerplus__nav-icon:hover, .careerplus__theme-toggle:hover {
-    color: var(--jobapplication-link);
-}
-
-/* Footer Styles */
-.careerplus__footer {
-    background: var(--jobapplication-footer-bg-light);
-    border-top: 1.5px solid var(--jobapplication-footer-border-light);
-    padding: 4rem 0 2rem;
-    width: 100%;
-    position: relative;
-    z-index: 10;
-    margin-top: auto;
-}
-
-.careerplus-jobapplication-root.dark .careerplus__footer {
-    background: var(--jobapplication-footer-bg-dark);
-    border-top: 1.5px solid var(--jobapplication-footer-border-dark);
-}
-
-.careerplus__footer-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 3rem;
-}
-
-.careerplus__footer-brand {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.careerplus__footer-text {
-    color: var(--jobapplication-subtitle-light);
-    line-height: 1.6;
-}
-
-.careerplus-jobapplication-root.dark .careerplus__footer-text {
-    color: var(--jobapplication-subtitle-dark);
-}
-
-.careerplus__footer-heading {
-    color: var(--jobapplication-title-light);
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.careerplus-jobapplication-root.dark .careerplus__footer-heading {
-    color: var(--jobapplication-title-dark);
-}
-
-.careerplus__footer-link {
-    color: var(--jobapplication-subtitle-light);
-    text-decoration: none;
-    display: block;
-    margin-bottom: 0.75rem;
-    transition: color 0.2s;
-}
-
-.careerplus-jobapplication-root.dark .careerplus__footer-link {
-    color: var(--jobapplication-subtitle-dark);
-}
-
-.careerplus__footer-link:hover {
-    color: var(--jobapplication-link);
-}
-
-.careerplus__social-icons {
-    display: flex;
-    gap: 1rem;
-}
-
-.careerplus__social-icon {
-    color: var(--jobapplication-subtitle-light);
-    font-size: 1.5rem;
-    transition: color 0.2s;
-}
-
-.careerplus-jobapplication-root.dark .careerplus__social-icon {
-    color: var(--jobapplication-subtitle-dark);
-}
-
-.careerplus__social-icon:hover {
-    color: var(--jobapplication-link);
-}
-
-.careerplus__footer-bottom {
-    max-width: 1200px;
-    margin: 3rem auto 0;
-    padding: 2rem 2rem 0;
-    border-top: 1px solid var(--jobapplication-footer-border-light);
-    text-align: center;
-    color: var(--jobapplication-subtitle-light);
-}
-
-.careerplus-jobapplication-root.dark .careerplus__footer-bottom {
-    border-top-color: var(--jobapplication-footer-border-dark);
-    color: var(--jobapplication-subtitle-dark);
+@media (max-width: 600px) {
+    .careerplus__header-container,
+    .careerplus__footer-container {
+        padding: 0.7rem 0.5rem;
+    }
+    
+    .careerplus-jobapplication-main {
+        padding: 1.2rem 0.2rem;
+        margin-top: 5.2rem;
+    }
+    
+    .careerplus__logo {
+        font-size: 1.1rem;
+    }
 }
