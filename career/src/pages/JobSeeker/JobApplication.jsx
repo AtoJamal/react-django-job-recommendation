@@ -12,70 +12,41 @@ const JobApplication = () => {
     const [formData, setFormData] = useState({
         introduction: '',
         additional_skills: '',
-        certificate: null,
-        resume: null
+        certificate: null
     });
+    const [jobDetails, setJobDetails] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null);
-    // Theme logic
-    const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
-        if (!savedTheme) {
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        return savedTheme;
+        return savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     });
 
+    // Fetch job details and verify authentication
     useEffect(() => {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-    }, [theme]);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 50) {
-                setScrolled(true);
-            } else {
-                setScrolled(false);
-            }
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    const toggleTheme = () => {
-        setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
-        navigate('/login');
-    };
-
-    // Authentication check
-    useEffect(() => {
-        const checkAuth = async () => {
+        const fetchData = async () => {
             try {
-                const response = await api.get('/auth/verify/');
-                setUser(response.data.user);
-                if (response.data.user && response.data.user.type === 'jobseeker') {
-                    const resumeResponse = await api.get(`/jobseekers/${response.data.user.id}/resume/`);
-                    setFormData(prev => ({ ...prev, resume: resumeResponse.data }));
-                } else {
+                // Verify authentication
+                const authResponse = await api.verifyAuth();
+                if (!authResponse.data?.user?.type === 'jobseeker') {
                     navigate('/login');
+                    return;
                 }
+                setUser(authResponse.data.user);
+
+                // Fetch job details
+                const jobResponse = await api.getJobDetails(jobId);
+                setJobDetails(jobResponse.data);
             } catch (err) {
-                console.error('Authentication check failed:', err);
+                console.error('Error fetching data:', err);
                 navigate('/login');
             }
         };
-        checkAuth();
-    }, [navigate]);
+
+        fetchData();
+    }, [jobId, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -88,29 +59,26 @@ const JobApplication = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!user || user.type !== 'jobseeker') {
-            setError('Please login as a job seeker to apply');
+        if (!user) {
+            setError('Please login to apply');
             return;
         }
+
         setIsSubmitting(true);
         setError(null);
+
         try {
             const formDataToSend = new FormData();
             formDataToSend.append('job', jobId);
             formDataToSend.append('job_seeker', user.id);
             formDataToSend.append('introduction', formData.introduction);
             formDataToSend.append('additional_skills', formData.additional_skills);
+            
             if (formData.certificate) {
                 formDataToSend.append('certificate', formData.certificate);
             }
-            if (formData.resume) {
-                formDataToSend.append('resume', formData.resume);
-            }
-            const response = await api.post('/applications/', formDataToSend, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+
+            await api.submitApplication(formDataToSend);
             setShowSuccess(true);
             setTimeout(() => navigate('/jobs'), 3000);
         } catch (err) {
@@ -120,55 +88,14 @@ const JobApplication = () => {
         }
     };
 
-    if (!user) {
-        return <div className="careerplus-jobapplication-loading">Checking authentication...</div>;
+    if (!user || !jobDetails) {
+        return <div className="careerplus-jobapplication-loading">Loading...</div>;
     }
 
     return (
         <div className={`careerplus-jobapplication-root ${theme}`}>
-            {/* Header */}
-            <motion.header
-                className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
-                initial={{ backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)' }}
-                animate={{
-                    backgroundColor: scrolled
-                        ? (theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)')
-                        : (theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)')
-                }}
-                transition={{ duration: 0.3 }}
-            >
-                <div className="careerplus__header-container">
-                    <motion.h1
-                        className="careerplus__logo"
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        CareerPlus
-                    </motion.h1>
-                    <nav className="careerplus__nav">
-                        <Link to="/jobsearch" className="careerplus__nav-icon" aria-label="Job Search">
-                            <FiSearch />
-                        </Link>
-                        <button
-                            className="careerplus__nav-icon"
-                            onClick={handleLogout}
-                            aria-label="Logout"
-                        >
-                            <FiLogOut />
-                        </button>
-                        <button
-                            className="careerplus__theme-toggle"
-                            onClick={toggleTheme}
-                            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-                        >
-                            {theme === 'light' ? <FiMoon /> : <FiSun />}
-                        </button>
-                    </nav>
-                </div>
-            </motion.header>
+            {/* Header - keep your existing header code */}
 
-            {/* Main Job Application Section */}
             <main className="careerplus-jobapplication-main">
                 <motion.section
                     className="careerplus-jobapplication-card glass-card"
@@ -176,20 +103,25 @@ const JobApplication = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
-                    <h1 className="careerplus-jobapplication-title">Apply for Job</h1>
-                    <p className="careerplus-jobapplication-subtitle">Submit your application to land your dream job</p>
+                    <h1 className="careerplus-jobapplication-title">Apply for {jobDetails.job_title}</h1>
+                    <p className="careerplus-jobapplication-subtitle">
+                        {jobDetails.employer?.company?.name || 'Unknown Company'}
+                    </p>
+
                     {showSuccess && (
                         <div className="careerplus-jobapplication-success">
                             <FiCheckCircle className="success-icon" />
                             <p>Application submitted successfully! Redirecting...</p>
                         </div>
                     )}
-                    {error && (
-                        <div className="careerplus-jobapplication-error">{error}</div>
-                    )}
-                    <form onSubmit={handleSubmit} className="careerplus-jobapplication-form" style={{ opacity: isSubmitting ? 0.5 : 1 }}>
+
+                    {error && <div className="careerplus-jobapplication-error">{error}</div>}
+
+                    <form onSubmit={handleSubmit} className="careerplus-jobapplication-form">
                         <div className="form-group">
-                            <label htmlFor="introduction" className="careerplus-jobapplication-label">Introduction *</label>
+                            <label htmlFor="introduction" className="careerplus-jobapplication-label">
+                                Introduction *
+                            </label>
                             <textarea
                                 id="introduction"
                                 name="introduction"
@@ -198,10 +130,13 @@ const JobApplication = () => {
                                 required
                                 className="careerplus-jobapplication-input"
                                 placeholder="Tell us about yourself and why you're a great fit"
-                            ></textarea>
+                            />
                         </div>
+
                         <div className="form-group">
-                            <label htmlFor="additional_skills" className="careerplus-jobapplication-label">Additional Skills</label>
+                            <label htmlFor="additional_skills" className="careerplus-jobapplication-label">
+                                Additional Skills
+                            </label>
                             <textarea
                                 id="additional_skills"
                                 name="additional_skills"
@@ -209,8 +144,9 @@ const JobApplication = () => {
                                 onChange={handleChange}
                                 className="careerplus-jobapplication-input"
                                 placeholder="List any additional skills relevant to the job"
-                            ></textarea>
+                            />
                         </div>
+
                         <div className="form-group">
                             <label className="careerplus-jobapplication-label">Certificate (Optional)</label>
                             <div className="file-upload">
@@ -235,17 +171,7 @@ const JobApplication = () => {
                             </div>
                             <p className="file-hint">Accepted formats: PDF, DOC, DOCX (Max 5MB)</p>
                         </div>
-                        <div className="form-group">
-                            <label className="careerplus-jobapplication-label">Resume</label>
-                            {formData.resume ? (
-                                <div className="resume-attachment">
-                                    <FiPaperclip className="attach-icon" />
-                                    <span>Resume attached from profile</span>
-                                </div>
-                            ) : (
-                                <p className="resume-missing">No resume found in your profile. Please upload one in your profile settings.</p>
-                            )}
-                        </div>
+
                         <div className="form-actions">
                             <button
                                 type="submit"
@@ -258,6 +184,7 @@ const JobApplication = () => {
                     </form>
                 </motion.section>
             </main>
+
 
             {/* Footer */}
             <footer id="contact" className="careerplus__footer">

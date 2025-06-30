@@ -58,10 +58,20 @@ export default {
   getJobSeekers: () => api.get('/jobseekers/'),
   getApplications: () => api.get('/applications/'),
   postJob: (data) => api.post('/jobs/', data),
+  getJobSeekerProfile: () => api.get('/jobseekers/me/'),
+  updateJobSeekerProfile: (data) => api.patch('/jobseekers/me/', data),
   updateJob: (id, data) => api.patch(`/jobs/${id}/`, data),
   getJobs: (searchTerm) => api.get('/jobs/', {
     params: {
       search: searchTerm || '' 
     }
   }),
+  verifyAuth: () => api.get('/auth/verify/'),
+  getJobSeekerResume: (userId) => api.get(`/jobseekers/${userId}/resume/`),
+  submitApplication: (data) => api.post('/applications/', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  }),
+  getJobDetails: (jobId) => api.get(`/jobs/${jobId}/`),
 };

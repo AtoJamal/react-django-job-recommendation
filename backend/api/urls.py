@@ -21,4 +21,6 @@ urlpatterns = [
     path('register/employer/', EmployerViewSet.as_view({'post': 'register'}), name='employer-register'),
     path('login/jobseeker/', JobSeekerViewSet.as_view({'post': 'login'}), name='jobseeker-login'),
     path('login/employer/', EmployerViewSet.as_view({'post': 'login'}), name='employer-login'),
+
+    path('jobseekers/me/', JobSeekerViewSet.as_view({'get': 'me', 'patch': 'me'}), name='jobseeker-me'),
 ]

@@ -8,6 +8,21 @@ from .models import Admin, Employer, JobSeeker, Job, JobApplicant, Company
 from django.contrib.auth.models import User
 from .serializers import EmployerRegistrationSerializer, EmployerLoginSerializer, EmployerSerializer 
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import JobSeeker
+from .serializers import JobSeekerRegistrationSerializer, JobSeekerLoginSerializer
+
+
 from .serializers import (
     AdminSerializer, 
     EmployerSerializer, 
@@ -72,18 +87,17 @@ class EmployerViewSet(viewsets.ModelViewSet):
         
         return Response(response_data, status=status.HTTP_200_OK)
     
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
-from rest_framework import status, viewsets
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-from .models import JobSeeker
-from .serializers import JobSeekerRegistrationSerializer, JobSeekerLoginSerializer
 
 class JobSeekerViewSet(viewsets.ViewSet):
+
+    permission_classes = [AllowAny]
+
+    
     def get_permissions(self):
         if self.action in ['register', 'login']:
             return []  # No permissions required for login/register
+        elif self.action in ['retrieve', 'update', 'partial_update', 'me']:
+            return [IsAuthenticated()]
         return super().get_permissions()
 
     @action(detail=False, methods=['post'])
@@ -154,9 +168,19 @@ class JobSeekerViewSet(viewsets.ViewSet):
         except (User.DoesNotExist, JobSeeker.DoesNotExist):
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework_simplejwt.authentication import JWTAuthentication
+    
+    @action(detail=False, methods=['get', 'patch'])
+    def me(self, request):
+        if request.method == 'GET':
+            job_seeker = request.user.jobseeker_profile
+            serializer = JobSeekerSerializer(job_seeker)
+            return Response(serializer.data)
+        elif request.method == 'PATCH':
+            job_seeker = request.user.jobseeker_profile
+            serializer = JobSeekerSerializer(job_seeker, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
 
 class JobViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
@@ -177,6 +201,8 @@ class JobViewSet(viewsets.ModelViewSet):
             serializer.save(employer=employer, is_approved=False)
         else:
             serializer.save(is_approved=False)
+
+    
 
     def get_permissions(self):
         # Only authenticated users can create jobs

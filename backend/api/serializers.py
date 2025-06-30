@@ -121,6 +121,10 @@ class JobApplicantSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplicant
         fields = '__all__'
+        extra_kwargs = {
+            'certificate': {'required': False},
+            'resume': {'required': False}  # Changed from required=True
+        }
 
 class JobSeekerLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -201,8 +205,8 @@ class EmployerRegistrationSerializer(serializers.ModelSerializer):
 
 
 class EmployerLoginSerializer(serializers.Serializer):
-    # Authenticate against Django's User model using username (or email) and password
-    email = serializers.EmailField() # Or username, if that's what your users log in with
+    
+    email = serializers.EmailField() 
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):

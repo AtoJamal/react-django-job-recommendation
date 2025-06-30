@@ -8,8 +8,7 @@ import SecurityForm from '../../components/JobSeeker/SecurityForm';
 import AppliedJobList from '../../components/JobSeeker/AppliedJobList';
 import defaultProfile from '../../assets/man1.jpg';
 import '../../styles/pages/JobSeeker/JobSeekerAccount.css';
-
-import logoImage from '../../assets/image-3.png'
+import api from '../../api';
 
 const JobSeekerAccount = () => {
     const navigate = useNavigate();
@@ -21,6 +20,11 @@ const JobSeekerAccount = () => {
         }
         return savedTheme;
     });
+
+    const [profile, setProfile] = useState(null);
+    const [appliedJobs, setAppliedJobs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
@@ -39,80 +43,108 @@ const JobSeekerAccount = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch profile using the new endpoint
+                const profileResponse = await api.getJobSeekerProfile();
+                const profileData = profileResponse.data;
+
+                setProfile({
+                    firstName: profileData.first_name,
+                    middleName: profileData.middle_name || '',
+                    lastName: profileData.last_name,
+                    email: profileData.email,
+                    age: profileData.age,
+                    gender: profileData.gender,
+                    phone: profileData.phone_number,
+                    degree: profileData.degree,
+                    fieldOfStudy: profileData.field_of_study,
+                    profilePic: defaultProfile,
+                    resumeUrl: null
+                });
+
+                // Fetch applications
+                const jobsResponse = await api.getApplications();
+                setAppliedJobs(jobsResponse.data.map(job => ({
+                    id: job.id,
+                    title: job.job?.job_title || 'No title',
+                    company: job.job?.employer?.company?.name || 'Unknown Company',
+                    appliedDate: job.application_time,
+                    status: job.status,
+                    logo: null
+                })));
+
+            } catch (err) {
+                setError(err.response?.data?.message || err.message || 'Failed to fetch data');
+                console.error('Error fetching data:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     const toggleTheme = () => {
         setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
     };
 
     const handleLogout = () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
         navigate('/');
     };
-
-    const [profile, setProfile] = useState({
-        firstName: 'Abebe',
-        middleName: 'Abebe',
-        lastName: 'Abebe',
-        email: 'abebe.Abebe@example.com',
-        age: 28,
-        gender: 'Male',
-        phone: '+1 (555) 123-4567',
-        degree: 'Master of Science',
-        fieldOfStudy: 'Computer Science',
-        profilePic: defaultProfile,
-        resumeUrl: logoImage
-    });
-
-    const [appliedJobs, setAppliedJobs] = useState([
-        {
-            id: 1,
-            title: 'Senior UX Designer',
-            company: 'TechCorp Inc.',
-            appliedDate: '2023-05-15',
-            status: 'Under Review',
-            logo: logoImage
-        },
-        {
-            id: 2,
-            title: 'Product Manager',
-            company: 'Innovate Solutions',
-            appliedDate: '2023-06-02',
-            status: 'Interview Scheduled',
-            logo: logoImage
-        },
-        {
-            id: 3,
-            title: 'Frontend Developer',
-            company: 'WebCraft Studios',
-            appliedDate: '2023-06-10',
-            status: 'Rejected',
-            logo: logoImage
-        }
-    ]);
 
     const [activeSection, setActiveSection] = useState('profile');
     const [isEditing, setIsEditing] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-    const handleUpdateProfile = (updatedData) => {
-        setProfile({ ...profile, ...updatedData });
-        setIsEditing(false);
+    const handleUpdateProfile = async (updatedData) => {
+        try {
+            // Here you would make an API call to update the profile
+            // For now, we'll just update the local state
+            setProfile(prev => ({ ...prev, ...updatedData }));
+            setIsEditing(false);
+        } catch (err) {
+            console.error('Error updating profile:', err);
+        }
     };
 
-    const handleDeleteAccount = () => {
-        console.log('Account deleted');
-        setShowDeleteConfirm(false);
+    const handleDeleteAccount = async () => {
+        try {
+            // Here you would make an API call to delete the account
+            console.log('Account deleted');
+            setShowDeleteConfirm(false);
+            handleLogout();
+        } catch (err) {
+            console.error('Error deleting account:', err);
+        }
     };
 
     const statusColors = {
-        'Under Review': '#3b82f6',
-        'Interview Scheduled': '#10b981',
-        'Rejected': '#ef4444',
-        'Offer Received': '#8b5cf6'
+        'pending': '#3b82f6',
+        'approved': '#10b981',
+        'rejected': '#ef4444',
+        'interview_scheduled': '#8b5cf6'
     };
+
+    if (loading) {
+        return <div className="loading-container">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="error-container">Error: {error}</div>;
+    }
+
+    if (!profile) {
+        return <div className="error-container">No profile data found</div>;
+    }
 
     return (
         <div className={`job-seeker-account ${theme}`}>
-            {/* Header */}
+            {/* Header - unchanged */}
             <motion.header
                 className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
                 initial={{ backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)' }}
@@ -121,8 +153,8 @@ const JobSeekerAccount = () => {
                         ? (theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)')
                         : (theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)')
                 }}
-            transition={{ duration: 0.3 }}
-        >
+                transition={{ duration: 0.3 }}
+            >
                 <div className="careerplus__header-container">
                     <motion.h1
                         className="careerplus__logo"
@@ -334,7 +366,7 @@ const JobSeekerAccount = () => {
                 </div>
             </div>
 
-            {/* Footer */}
+            {/* Footer - unchanged */}
             <motion.footer className="careerplus__footer"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
