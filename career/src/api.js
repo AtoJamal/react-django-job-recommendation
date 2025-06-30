@@ -68,10 +68,13 @@ export default {
   }),
   verifyAuth: () => api.get('/auth/verify/'),
   getJobSeekerResume: (userId) => api.get(`/jobseekers/${userId}/resume/`),
-  submitApplication: (data) => api.post('/applications/', data, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  }),
+  submitApplication: (data) => {
+    return api.post('/applications/', data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        }
+    });
+},
   getJobDetails: (jobId) => api.get(`/jobs/${jobId}/`),
 };

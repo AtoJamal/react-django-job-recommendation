@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiUpload, FiPaperclip, FiCheckCircle, FiSun, FiMoon, FiLogOut, FiSearch } from 'react-icons/fi';
 import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
@@ -18,35 +18,48 @@ const JobApplication = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [error, setError] = useState(null);
-    const [user, setUser] = useState(null);
+    const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
-        return savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (!savedTheme) {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return savedTheme;
     });
 
-    // Fetch job details and verify authentication
+    // Theme handling
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Verify authentication
-                const authResponse = await api.verifyAuth();
-                if (!authResponse.data?.user?.type === 'jobseeker') {
-                    navigate('/login');
-                    return;
-                }
-                setUser(authResponse.data.user);
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
 
-                // Fetch job details
-                const jobResponse = await api.getJobDetails(jobId);
-                setJobDetails(jobResponse.data);
+    // Scroll handling
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                setScrolled(true);
+            } else {
+                setScrolled(false);
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Fetch job details
+    useEffect(() => {
+        const fetchJobDetails = async () => {
+            try {
+                const response = await api.getJobDetails(jobId);
+                setJobDetails(response.data);
             } catch (err) {
-                console.error('Error fetching data:', err);
-                navigate('/login');
+                console.error('Error fetching job details:', err);
+                setError('Failed to load job details');
             }
         };
 
-        fetchData();
-    }, [jobId, navigate]);
+        fetchJobDetails();
+    }, [jobId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -59,18 +72,12 @@ const JobApplication = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!user) {
-            setError('Please login to apply');
-            return;
-        }
-
         setIsSubmitting(true);
         setError(null);
 
         try {
             const formDataToSend = new FormData();
             formDataToSend.append('job', jobId);
-            formDataToSend.append('job_seeker', user.id);
             formDataToSend.append('introduction', formData.introduction);
             formDataToSend.append('additional_skills', formData.additional_skills);
             
@@ -78,24 +85,76 @@ const JobApplication = () => {
                 formDataToSend.append('certificate', formData.certificate);
             }
 
-            await api.submitApplication(formDataToSend);
-            setShowSuccess(true);
-            setTimeout(() => navigate('/jobs'), 3000);
+            const response = await api.submitApplication(formDataToSend);
+            
+            if (response.status === 201) {
+                setShowSuccess(true);
+                setTimeout(() => navigate('/jobsearch'), 3000);
+            } else {
+                throw new Error('Failed to submit application');
+            }
         } catch (err) {
+            console.error('Application error:', err);
             setError(err.response?.data?.message || 'Application failed. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    if (!user || !jobDetails) {
-        return <div className="careerplus-jobapplication-loading">Loading...</div>;
+    const toggleTheme = () => {
+        setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    };
+
+    const handleLogout = () => {
+        localStorage.clear();
+        navigate('/');
+    };
+
+    if (!jobDetails) {
+        return <div className="careerplus-jobapplication-loading">Loading job details...</div>;
     }
 
     return (
         <div className={`careerplus-jobapplication-root ${theme}`}>
-            {/* Header - keep your existing header code */}
+            {/* Header */}
+            <motion.header
+                className={`careerplus__header ${scrolled ? 'scrolled' : ''}`}
+                initial={{ backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)' }}
+                animate={{
+                    backgroundColor: scrolled
+                        ? (theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)')
+                        : (theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)')
+                }}
+                transition={{ duration: 0.3 }}
+            >
+                <div className="careerplus__header-container">
+                    <motion.h1
+                        className="careerplus__logo"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>CareerPlus</a>
+                    </motion.h1>
+                    <nav className="careerplus__nav">
+                        <button className="careerplus__nav-icon" title="Search Jobs" onClick={() => navigate('/jobsearch')}>
+                            <FiSearch />
+                        </button>
+                        <button className="careerplus__nav-icon" title="Logout" onClick={handleLogout}>
+                            <FiLogOut />
+                        </button>
+                        <button
+                            className="careerplus__theme-toggle"
+                            onClick={toggleTheme}
+                            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+                        >
+                            {theme === 'light' ? <FiMoon /> : <FiSun />}
+                        </button>
+                    </nav>
+                </div>
+            </motion.header>
 
+            {/* Main Content */}
             <main className="careerplus-jobapplication-main">
                 <motion.section
                     className="careerplus-jobapplication-card glass-card"
@@ -185,9 +244,13 @@ const JobApplication = () => {
                 </motion.section>
             </main>
 
-
             {/* Footer */}
-            <footer id="contact" className="careerplus__footer">
+            <motion.footer
+                className="careerplus__footer"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+            >
                 <div className="careerplus__footer-container">
                     <div className="careerplus__footer-brand">
                         <h3 className="careerplus__logo">CareerPlus</h3>
@@ -208,7 +271,7 @@ const JobApplication = () => {
                     </div>
                     <div className="careerplus__footer-social">
                         <h4 className="careerplus__footer-heading">Follow Us</h4>
-                        <div className="careerplus__social-icons ESI">
+                        <div className="careerplus__social-icons">
                             <a href="#" className="careerplus__social-icon"><FaLinkedin /></a>
                             <a href="#" className="careerplus__social-icon"><FaTwitter /></a>
                             <a href="#" className="careerplus__social-icon"><FaGithub /></a>
@@ -218,7 +281,7 @@ const JobApplication = () => {
                 <div className="careerplus__footer-bottom">
                     <p>© {new Date().getFullYear()} CareerPlus. All rights reserved.</p>
                 </div>
-            </footer>
+            </motion.footer>
         </div>
     );
 };

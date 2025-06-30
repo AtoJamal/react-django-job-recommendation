@@ -182,6 +182,14 @@ class JobSeekerViewSet(viewsets.ViewSet):
             serializer.save()
             return Response(serializer.data)
 
+    @action(detail=True, methods=['get'], url_path='resume')
+    def get_resume(self, request, pk=None):
+        job_seeker = self.get_object()
+        if hasattr(job_seeker, 'resume'):
+            serializer = ResumeSerializer(job_seeker.resume)
+            return Response(serializer.data)
+        return Response({'detail': 'No resume found'}, status=404)
+
 class JobViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -215,6 +223,7 @@ class JobApplicantViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = JobApplicant.objects.all()
     serializer_class = JobApplicantSerializer
+    
 
     def perform_create(self, serializer):
         # Get the job seeker profile for the current user
@@ -229,5 +238,32 @@ class JobApplicantViewSet(viewsets.ModelViewSet):
         elif hasattr(self.request.user, 'employer_profile'):
             return self.queryset.filter(job__employer=self.request.user.employer_profile)
         return self.queryset.none()
+
+    def create(self, request):
+        try:
+            # Get the job seeker profile
+            job_seeker = request.user.jobseeker_profile
+            
+            # Create application data
+            application_data = {
+                'job': request.data.get('job'),
+                'job_seeker': job_seeker.id,
+                'introduction': request.data.get('introduction'),
+                'additional_skills': request.data.get('additional_skills'),
+                'status': 'pending'
+            }
+
+            # Handle file upload
+            if 'certificate' in request.FILES:
+                application_data['certificate'] = request.FILES['certificate']
+
+            serializer = self.get_serializer(data=application_data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 

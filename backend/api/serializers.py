@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Admin, Employer, JobSeeker, Job, JobApplicant, Company
+from .models import Admin, Employer, JobSeeker, Job, JobApplicant, Company, Resume
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import User 
 
@@ -122,8 +122,8 @@ class JobApplicantSerializer(serializers.ModelSerializer):
         model = JobApplicant
         fields = '__all__'
         extra_kwargs = {
-            'certificate': {'required': False},
-            'resume': {'required': False}  # Changed from required=True
+            'certificate': {'required': False, 'allow_null': True},
+            'resume': {'required': False, 'allow_null': True}
         }
 
 class JobSeekerLoginSerializer(serializers.Serializer):
@@ -235,3 +235,10 @@ class EmployerLoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Invalid credentials")
         else:
             raise serializers.ValidationError("Must include 'email' and 'password'")
+
+
+class ResumeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Resume
+        fields = ['id', 'file', 'uploaded_at']
+
